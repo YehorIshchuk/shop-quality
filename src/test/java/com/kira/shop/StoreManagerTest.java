@@ -155,4 +155,14 @@ class StoreManagerTest {
         assertEquals(OrderStatus.NEW, order.getStatus());
         assertThrows(IllegalArgumentException.class, () -> store.payOrder("missing"));
     }
+
+    @Test
+    void couponAndMonthlySummary() {
+        Customer gold = TestData.customer(CustomerTier.GOLD);
+        Order order = store.placeOrder(gold, Map.of("B1", 4));
+        assertEquals(new BigDecimal("200.00"), store.applyCoupon(order.getId(), "WELCOME10"));
+        assertTrue(store.generateCouponCode(gold).startsWith("C-GOLD-"));
+        store.payOrder(order.getId());
+        assertTrue(store.buildCustomerSummaryForMonth(gold, YearMonth.now()).contains("Paid orders: 1"));
+    }
 }
