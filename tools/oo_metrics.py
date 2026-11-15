@@ -280,7 +280,13 @@ def parse_project(src_root: Path, exclude=()) -> dict:
         if path.stem in exclude:
             continue
         text = path.read_text(encoding="utf-8")
-        cu = javalang.parse.parse(text)
+        try:
+            cu = javalang.parse.parse(text)
+        except (javalang.parser.JavaSyntaxError, javalang.tokenizer.LexerError) as e:
+            at = getattr(e, "at", None)
+            where = f" near line {at.position.line}" if at is not None and getattr(at, "position", None) else ""
+            sys.exit(f"ERROR: cannot parse {path}{where}. javalang supports Java syntax up to Java 8 "
+                     f"(+ var); rewrite switch expressions / records / text blocks in this file.")
         pkg = cu.package.name if cu.package else ""
         for _, decl in cu.filter(T.TypeDeclaration):
             kind = ("interface" if isinstance(decl, T.InterfaceDeclaration)

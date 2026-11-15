@@ -1,4 +1,4 @@
-package com.kira.shop.infrastructure;
+package com.kira.shop.application.port;
 
 /** Результат спроби оплати. */
 public final class PaymentResult {

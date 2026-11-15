@@ -1,5 +1,6 @@
 package com.kira.shop.infrastructure;
 
+import com.kira.shop.application.port.OrderStore;
 import com.kira.shop.domain.Order;
 import com.kira.shop.domain.OrderStatus;
 import com.kira.shop.dto.OrderDto;
@@ -18,18 +19,21 @@ import java.util.Map;
 import java.util.Optional;
 
 /** Сховище замовлень з можливістю експорту у CSV-файл. */
-public class FileOrderRepository {
+public class FileOrderRepository implements OrderStore {
     private static final String HEADER = "order_id;customer;status;items;total";
     private final Map<String, Order> orders = new LinkedHashMap<>();
 
+    @Override
     public void save(Order order) {
         orders.put(order.getId(), order);
     }
 
+    @Override
     public Optional<Order> findById(String id) {
         return Optional.ofNullable(orders.get(id));
     }
 
+    @Override
     public List<Order> findAll() {
         return new ArrayList<>(orders.values());
     }

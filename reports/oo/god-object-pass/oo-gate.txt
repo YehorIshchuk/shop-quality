@@ -1,0 +1,15 @@
+classes=41  MHF=5.7%  AHF=100.0%  MIF=13.5%  AIF=0.0%  COF=6.0%  PF=31.2%
+max CBO: OrderPlacementService CBO=8 LCOM=0.0 LCOM4=1 WMC=5
+written: reports/oo/god-object-pass/oo-metrics.json, oo-metrics.md, coupling-matrix.html|csv, dependency-graph.mmd
+  PASS OrderPlacementService: CBO=8 LCOM=0.0 LCOM4=1 DIT=1 NMO=0
+  PASS OrderPaymentService: CBO=7 LCOM=0.0 LCOM4=1 DIT=1 NMO=0
+  PASS OrderShippingService: CBO=3 LCOM=0.0 LCOM4=1 DIT=1 NMO=0
+  PASS OrderCancellationService: CBO=6 LCOM=0.0 LCOM4=1 DIT=1 NMO=0
+  PASS CatalogService: CBO=3 LCOM=0.0 LCOM4=1 DIT=1 NMO=0
+  PASS PromotionService: CBO=5 LCOM=0.0 LCOM4=1 DIT=1 NMO=0
+  PASS CustomerInsightsService: CBO=7 LCOM=0.0 LCOM4=1 DIT=1 NMO=0
+  PASS SalesReportingService: CBO=5 LCOM=0.0 LCOM4=1 DIT=1 NMO=0
+  PASS PricingService: CBO=5 LCOM=0.0 LCOM4=2 DIT=1 NMO=0
+  PASS StockAllocator: CBO=7 LCOM=0.0 LCOM4=1 DIT=1 NMO=0
+  PASS SalesLedger: CBO=3 LCOM=0.0 LCOM4=1 DIT=1 NMO=0
+OO GATE: PASS
