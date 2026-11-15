@@ -1,0 +1,1645 @@
+{
+  "classes": [
+    {
+      "class": "Address",
+      "kind": "class",
+      "package": "com.kira.shop.domain",
+      "file": "src/main/java/com/kira/shop/domain/Address.java",
+      "WMC": 7,
+      "CBO": 0,
+      "Ca": 2,
+      "RFC": 8,
+      "LCOM": 0.75,
+      "LCOM4": 1,
+      "DIT": 1,
+      "NOC": 0,
+      "NOM": 6,
+      "NOF": 5,
+      "NMO": 0,
+      "NMA": 6,
+      "PIM": 6,
+      "overridden": [],
+      "maxCognitive": 0,
+      "maxCognitiveMethod": "getStreet",
+      "couplesTo": [],
+      "usedBy": [
+        "Customer",
+        "StoreManager"
+      ],
+      "methods": [
+        {
+          "name": "Address",
+          "params": 4,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "getStreet",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "getCity",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "getZip",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "getCountry",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "isDomestic",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "toString",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        }
+      ]
+    },
+    {
+      "class": "BaseReport",
+      "kind": "class",
+      "package": "com.kira.shop.report",
+      "file": "src/main/java/com/kira/shop/report/BaseReport.java",
+      "WMC": 17,
+      "CBO": 0,
+      "Ca": 1,
+      "RFC": 24,
+      "LCOM": 0.667,
+      "LCOM4": 1,
+      "DIT": 1,
+      "NOC": 1,
+      "NOM": 14,
+      "NOF": 3,
+      "NMO": 0,
+      "NMA": 14,
+      "PIM": 14,
+      "overridden": [],
+      "maxCognitive": 1,
+      "maxCognitiveMethod": "render",
+      "couplesTo": [],
+      "usedBy": [
+        "SalesReport"
+      ],
+      "methods": [
+        {
+          "name": "BaseReport",
+          "params": 1,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "getTitle",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "setTitle",
+          "params": 1,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "getSeparator",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "setSeparator",
+          "params": 1,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "addRow",
+          "params": 1,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "getRows",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "rowCount",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "isEmpty",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "clear",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "header",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "formatRow",
+          "params": 1,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "footer",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "render",
+          "params": 0,
+          "cyclomatic": 2,
+          "cognitive": 1
+        },
+        {
+          "name": "renderCsv",
+          "params": 0,
+          "cyclomatic": 2,
+          "cognitive": 1
+        }
+      ]
+    },
+    {
+      "class": "Category",
+      "kind": "enum",
+      "package": "com.kira.shop.domain",
+      "file": "src/main/java/com/kira/shop/domain/Category.java",
+      "WMC": 0,
+      "CBO": 0,
+      "Ca": 3,
+      "RFC": 0,
+      "LCOM": 0.0,
+      "LCOM4": 0,
+      "DIT": 1,
+      "NOC": 0,
+      "NOM": 0,
+      "NOF": 0,
+      "NMO": 0,
+      "NMA": 0,
+      "PIM": 0,
+      "overridden": [],
+      "maxCognitive": 0,
+      "maxCognitiveMethod": null,
+      "couplesTo": [],
+      "usedBy": [
+        "Product",
+        "ProductRepository",
+        "StoreManager"
+      ],
+      "methods": []
+    },
+    {
+      "class": "ConsoleNotificationSender",
+      "kind": "class",
+      "package": "com.kira.shop.infrastructure",
+      "file": "src/main/java/com/kira/shop/infrastructure/ConsoleNotificationSender.java",
+      "WMC": 2,
+      "CBO": 0,
+      "Ca": 1,
+      "RFC": 5,
+      "LCOM": 0.0,
+      "LCOM4": 1,
+      "DIT": 1,
+      "NOC": 0,
+      "NOM": 2,
+      "NOF": 2,
+      "NMO": 0,
+      "NMA": 2,
+      "PIM": 2,
+      "overridden": [],
+      "maxCognitive": 0,
+      "maxCognitiveMethod": "send",
+      "couplesTo": [],
+      "usedBy": [
+        "StoreManager"
+      ],
+      "methods": [
+        {
+          "name": "send",
+          "params": 3,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "getSent",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        }
+      ]
+    },
+    {
+      "class": "CsvUtils",
+      "kind": "class",
+      "package": "com.kira.shop.util",
+      "file": "src/main/java/com/kira/shop/util/CsvUtils.java",
+      "WMC": 9,
+      "CBO": 0,
+      "Ca": 2,
+      "RFC": 8,
+      "LCOM": 0.0,
+      "LCOM4": 2,
+      "DIT": 1,
+      "NOC": 0,
+      "NOM": 3,
+      "NOF": 1,
+      "NMO": 0,
+      "NMA": 3,
+      "PIM": 0,
+      "overridden": [],
+      "maxCognitive": 3,
+      "maxCognitiveMethod": "escape",
+      "couplesTo": [],
+      "usedBy": [
+        "FileOrderRepository",
+        "StoreManager"
+      ],
+      "methods": [
+        {
+          "name": "CsvUtils",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "escape",
+          "params": 1,
+          "cyclomatic": 5,
+          "cognitive": 3
+        },
+        {
+          "name": "join",
+          "params": 1,
+          "cyclomatic": 2,
+          "cognitive": 1
+        },
+        {
+          "name": "split",
+          "params": 1,
+          "cyclomatic": 1,
+          "cognitive": 0
+        }
+      ]
+    },
+    {
+      "class": "Customer",
+      "kind": "class",
+      "package": "com.kira.shop.domain",
+      "file": "src/main/java/com/kira/shop/domain/Customer.java",
+      "WMC": 10,
+      "CBO": 2,
+      "Ca": 2,
+      "RFC": 10,
+      "LCOM": 0.0,
+      "LCOM4": 1,
+      "DIT": 1,
+      "NOC": 0,
+      "NOM": 8,
+      "NOF": 6,
+      "NMO": 0,
+      "NMA": 8,
+      "PIM": 8,
+      "overridden": [],
+      "maxCognitive": 1,
+      "maxCognitiveMethod": "addLoyaltyPoints",
+      "couplesTo": [
+        "Address",
+        "CustomerTier"
+      ],
+      "usedBy": [
+        "Order",
+        "StoreManager"
+      ],
+      "methods": [
+        {
+          "name": "Customer",
+          "params": 5,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "getId",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "getName",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "getEmail",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "getAddress",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "getTier",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "setTier",
+          "params": 1,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "getLoyaltyPoints",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "addLoyaltyPoints",
+          "params": 1,
+          "cyclomatic": 2,
+          "cognitive": 1
+        }
+      ]
+    },
+    {
+      "class": "CustomerTier",
+      "kind": "enum",
+      "package": "com.kira.shop.domain",
+      "file": "src/main/java/com/kira/shop/domain/CustomerTier.java",
+      "WMC": 0,
+      "CBO": 0,
+      "Ca": 2,
+      "RFC": 0,
+      "LCOM": 0.0,
+      "LCOM4": 0,
+      "DIT": 1,
+      "NOC": 0,
+      "NOM": 0,
+      "NOF": 0,
+      "NMO": 0,
+      "NMA": 0,
+      "PIM": 0,
+      "overridden": [],
+      "maxCognitive": 0,
+      "maxCognitiveMethod": null,
+      "couplesTo": [],
+      "usedBy": [
+        "Customer",
+        "StoreManager"
+      ],
+      "methods": []
+    },
+    {
+      "class": "FakePaymentGateway",
+      "kind": "class",
+      "package": "com.kira.shop.infrastructure",
+      "file": "src/main/java/com/kira/shop/infrastructure/FakePaymentGateway.java",
+      "WMC": 5,
+      "CBO": 1,
+      "Ca": 1,
+      "RFC": 8,
+      "LCOM": 1.0,
+      "LCOM4": 2,
+      "DIT": 1,
+      "NOC": 0,
+      "NOM": 2,
+      "NOF": 2,
+      "NMO": 0,
+      "NMA": 2,
+      "PIM": 2,
+      "overridden": [],
+      "maxCognitive": 2,
+      "maxCognitiveMethod": "charge",
+      "couplesTo": [
+        "PaymentResult"
+      ],
+      "usedBy": [
+        "StoreManager"
+      ],
+      "methods": [
+        {
+          "name": "charge",
+          "params": 2,
+          "cyclomatic": 3,
+          "cognitive": 2
+        },
+        {
+          "name": "refund",
+          "params": 1,
+          "cyclomatic": 2,
+          "cognitive": 1
+        }
+      ]
+    },
+    {
+      "class": "FileOrderRepository",
+      "kind": "class",
+      "package": "com.kira.shop.infrastructure",
+      "file": "src/main/java/com/kira/shop/infrastructure/FileOrderRepository.java",
+      "WMC": 10,
+      "CBO": 5,
+      "Ca": 1,
+      "RFC": 25,
+      "LCOM": 0.0,
+      "LCOM4": 1,
+      "DIT": 1,
+      "NOC": 0,
+      "NOM": 6,
+      "NOF": 2,
+      "NMO": 0,
+      "NMA": 6,
+      "PIM": 6,
+      "overridden": [],
+      "maxCognitive": 3,
+      "maxCognitiveMethod": "findByStatus",
+      "couplesTo": [
+        "CsvUtils",
+        "Order",
+        "OrderDto",
+        "OrderMapper",
+        "OrderStatus"
+      ],
+      "usedBy": [
+        "StoreManager"
+      ],
+      "methods": [
+        {
+          "name": "save",
+          "params": 1,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "findById",
+          "params": 1,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "findAll",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "findByStatus",
+          "params": 1,
+          "cyclomatic": 3,
+          "cognitive": 3
+        },
+        {
+          "name": "exportCsv",
+          "params": 1,
+          "cyclomatic": 3,
+          "cognitive": 2
+        },
+        {
+          "name": "count",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        }
+      ]
+    },
+    {
+      "class": "InventoryStore",
+      "kind": "class",
+      "package": "com.kira.shop.infrastructure",
+      "file": "src/main/java/com/kira/shop/infrastructure/InventoryStore.java",
+      "WMC": 6,
+      "CBO": 0,
+      "Ca": 1,
+      "RFC": 7,
+      "LCOM": 0.0,
+      "LCOM4": 1,
+      "DIT": 1,
+      "NOC": 0,
+      "NOM": 4,
+      "NOF": 1,
+      "NMO": 0,
+      "NMA": 4,
+      "PIM": 4,
+      "overridden": [],
+      "maxCognitive": 1,
+      "maxCognitiveMethod": "add",
+      "couplesTo": [],
+      "usedBy": [
+        "StoreManager"
+      ],
+      "methods": [
+        {
+          "name": "getStock",
+          "params": 1,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "add",
+          "params": 2,
+          "cyclomatic": 2,
+          "cognitive": 1
+        },
+        {
+          "name": "reserve",
+          "params": 2,
+          "cyclomatic": 2,
+          "cognitive": 1
+        },
+        {
+          "name": "release",
+          "params": 2,
+          "cyclomatic": 1,
+          "cognitive": 0
+        }
+      ]
+    },
+    {
+      "class": "MoneyUtils",
+      "kind": "class",
+      "package": "com.kira.shop.util",
+      "file": "src/main/java/com/kira/shop/util/MoneyUtils.java",
+      "WMC": 6,
+      "CBO": 0,
+      "Ca": 4,
+      "RFC": 11,
+      "LCOM": 0.0,
+      "LCOM4": 2,
+      "DIT": 1,
+      "NOC": 0,
+      "NOM": 4,
+      "NOF": 0,
+      "NMO": 0,
+      "NMA": 4,
+      "PIM": 0,
+      "overridden": [],
+      "maxCognitive": 1,
+      "maxCognitiveMethod": "isPositive",
+      "couplesTo": [],
+      "usedBy": [
+        "MonthlySalesReport",
+        "OrderMapper",
+        "SalesReport",
+        "StoreManager"
+      ],
+      "methods": [
+        {
+          "name": "MoneyUtils",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "round",
+          "params": 1,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "percentOf",
+          "params": 2,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "format",
+          "params": 1,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "isPositive",
+          "params": 1,
+          "cyclomatic": 2,
+          "cognitive": 1
+        }
+      ]
+    },
+    {
+      "class": "MonthlySalesReport",
+      "kind": "class",
+      "package": "com.kira.shop.report",
+      "file": "src/main/java/com/kira/shop/report/MonthlySalesReport.java",
+      "WMC": 10,
+      "CBO": 3,
+      "Ca": 1,
+      "RFC": 14,
+      "LCOM": 0.2,
+      "LCOM4": 2,
+      "DIT": 3,
+      "NOC": 0,
+      "NOM": 7,
+      "NOF": 1,
+      "NMO": 6,
+      "NMA": 1,
+      "PIM": 19,
+      "overridden": [
+        "addSale/1",
+        "header/0",
+        "formatRow/1",
+        "footer/0",
+        "renderCsv/0",
+        "render/0"
+      ],
+      "maxCognitive": 1,
+      "maxCognitiveMethod": "addSale",
+      "couplesTo": [
+        "MoneyUtils",
+        "Order",
+        "SalesReport"
+      ],
+      "usedBy": [
+        "StoreManager"
+      ],
+      "methods": [
+        {
+          "name": "MonthlySalesReport",
+          "params": 1,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "getMonth",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "addSale",
+          "params": 1,
+          "cyclomatic": 2,
+          "cognitive": 1
+        },
+        {
+          "name": "header",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "formatRow",
+          "params": 1,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "footer",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "renderCsv",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "render",
+          "params": 0,
+          "cyclomatic": 2,
+          "cognitive": 1
+        }
+      ]
+    },
+    {
+      "class": "Order",
+      "kind": "class",
+      "package": "com.kira.shop.domain",
+      "file": "src/main/java/com/kira/shop/domain/Order.java",
+      "WMC": 26,
+      "CBO": 4,
+      "Ca": 5,
+      "RFC": 34,
+      "LCOM": 0.857,
+      "LCOM4": 1,
+      "DIT": 1,
+      "NOC": 0,
+      "NOM": 20,
+      "NOF": 7,
+      "NMO": 0,
+      "NMA": 20,
+      "PIM": 19,
+      "overridden": [],
+      "maxCognitive": 2,
+      "maxCognitiveMethod": "applyDiscount",
+      "couplesTo": [
+        "Customer",
+        "OrderItem",
+        "OrderStatus",
+        "Product"
+      ],
+      "usedBy": [
+        "FileOrderRepository",
+        "MonthlySalesReport",
+        "OrderMapper",
+        "SalesReport",
+        "StoreManager"
+      ],
+      "methods": [
+        {
+          "name": "Order",
+          "params": 3,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "getId",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "getCustomer",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "getCreatedAt",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "getItems",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "getStatus",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "getDiscount",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "getShippingCost",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "addItem",
+          "params": 2,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "applyDiscount",
+          "params": 1,
+          "cyclomatic": 3,
+          "cognitive": 2
+        },
+        {
+          "name": "setShippingCost",
+          "params": 1,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "subtotal",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "total",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "totalWeight",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "totalQuantity",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "isEmpty",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "markPaid",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "markShipped",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "markDelivered",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "cancel",
+          "params": 0,
+          "cyclomatic": 3,
+          "cognitive": 2
+        },
+        {
+          "name": "requireStatus",
+          "params": 1,
+          "cyclomatic": 2,
+          "cognitive": 1
+        }
+      ]
+    },
+    {
+      "class": "OrderDto",
+      "kind": "class",
+      "package": "com.kira.shop.dto",
+      "file": "src/main/java/com/kira/shop/dto/OrderDto.java",
+      "WMC": 6,
+      "CBO": 0,
+      "Ca": 3,
+      "RFC": 6,
+      "LCOM": 0.0,
+      "LCOM4": 0,
+      "DIT": 1,
+      "NOC": 0,
+      "NOM": 5,
+      "NOF": 5,
+      "NMO": 0,
+      "NMA": 5,
+      "PIM": 5,
+      "overridden": [],
+      "maxCognitive": 0,
+      "maxCognitiveMethod": "getOrderId",
+      "couplesTo": [],
+      "usedBy": [
+        "FileOrderRepository",
+        "OrderMapper",
+        "StoreManager"
+      ],
+      "methods": [
+        {
+          "name": "OrderDto",
+          "params": 5,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "getOrderId",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "getCustomerName",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "getStatus",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "getItemCount",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "getTotal",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        }
+      ]
+    },
+    {
+      "class": "OrderItem",
+      "kind": "class",
+      "package": "com.kira.shop.domain",
+      "file": "src/main/java/com/kira/shop/domain/OrderItem.java",
+      "WMC": 6,
+      "CBO": 1,
+      "Ca": 2,
+      "RFC": 9,
+      "LCOM": 0.0,
+      "LCOM4": 1,
+      "DIT": 1,
+      "NOC": 0,
+      "NOM": 4,
+      "NOF": 2,
+      "NMO": 0,
+      "NMA": 4,
+      "PIM": 4,
+      "overridden": [],
+      "maxCognitive": 0,
+      "maxCognitiveMethod": "getProduct",
+      "couplesTo": [
+        "Product"
+      ],
+      "usedBy": [
+        "Order",
+        "StoreManager"
+      ],
+      "methods": [
+        {
+          "name": "OrderItem",
+          "params": 2,
+          "cyclomatic": 2,
+          "cognitive": 1
+        },
+        {
+          "name": "getProduct",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "getQuantity",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "lineTotal",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "lineWeight",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        }
+      ]
+    },
+    {
+      "class": "OrderMapper",
+      "kind": "class",
+      "package": "com.kira.shop.dto",
+      "file": "src/main/java/com/kira/shop/dto/OrderMapper.java",
+      "WMC": 2,
+      "CBO": 3,
+      "Ca": 2,
+      "RFC": 10,
+      "LCOM": 0.0,
+      "LCOM4": 1,
+      "DIT": 1,
+      "NOC": 0,
+      "NOM": 1,
+      "NOF": 0,
+      "NMO": 0,
+      "NMA": 1,
+      "PIM": 0,
+      "overridden": [],
+      "maxCognitive": 0,
+      "maxCognitiveMethod": "toDto",
+      "couplesTo": [
+        "MoneyUtils",
+        "Order",
+        "OrderDto"
+      ],
+      "usedBy": [
+        "FileOrderRepository",
+        "StoreManager"
+      ],
+      "methods": [
+        {
+          "name": "OrderMapper",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "toDto",
+          "params": 1,
+          "cyclomatic": 1,
+          "cognitive": 0
+        }
+      ]
+    },
+    {
+      "class": "OrderStatus",
+      "kind": "enum",
+      "package": "com.kira.shop.domain",
+      "file": "src/main/java/com/kira/shop/domain/OrderStatus.java",
+      "WMC": 0,
+      "CBO": 0,
+      "Ca": 4,
+      "RFC": 0,
+      "LCOM": 0.0,
+      "LCOM4": 0,
+      "DIT": 1,
+      "NOC": 0,
+      "NOM": 0,
+      "NOF": 0,
+      "NMO": 0,
+      "NMA": 0,
+      "PIM": 0,
+      "overridden": [],
+      "maxCognitive": 0,
+      "maxCognitiveMethod": null,
+      "couplesTo": [],
+      "usedBy": [
+        "FileOrderRepository",
+        "Order",
+        "SalesReport",
+        "StoreManager"
+      ],
+      "methods": []
+    },
+    {
+      "class": "PaymentResult",
+      "kind": "class",
+      "package": "com.kira.shop.infrastructure",
+      "file": "src/main/java/com/kira/shop/infrastructure/PaymentResult.java",
+      "WMC": 6,
+      "CBO": 0,
+      "Ca": 2,
+      "RFC": 6,
+      "LCOM": 0.0,
+      "LCOM4": 2,
+      "DIT": 1,
+      "NOC": 0,
+      "NOM": 5,
+      "NOF": 3,
+      "NMO": 0,
+      "NMA": 5,
+      "PIM": 3,
+      "overridden": [],
+      "maxCognitive": 0,
+      "maxCognitiveMethod": "ok",
+      "couplesTo": [],
+      "usedBy": [
+        "FakePaymentGateway",
+        "StoreManager"
+      ],
+      "methods": [
+        {
+          "name": "PaymentResult",
+          "params": 3,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "ok",
+          "params": 1,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "declined",
+          "params": 1,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "isSuccess",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "getTransactionId",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "getMessage",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        }
+      ]
+    },
+    {
+      "class": "Product",
+      "kind": "class",
+      "package": "com.kira.shop.domain",
+      "file": "src/main/java/com/kira/shop/domain/Product.java",
+      "WMC": 11,
+      "CBO": 1,
+      "Ca": 4,
+      "RFC": 8,
+      "LCOM": 1.6,
+      "LCOM4": 1,
+      "DIT": 1,
+      "NOC": 0,
+      "NOM": 7,
+      "NOF": 5,
+      "NMO": 0,
+      "NMA": 7,
+      "PIM": 7,
+      "overridden": [],
+      "maxCognitive": 2,
+      "maxCognitiveMethod": "equals",
+      "couplesTo": [
+        "Category"
+      ],
+      "usedBy": [
+        "Order",
+        "OrderItem",
+        "ProductRepository",
+        "StoreManager"
+      ],
+      "methods": [
+        {
+          "name": "Product",
+          "params": 5,
+          "cyclomatic": 2,
+          "cognitive": 1
+        },
+        {
+          "name": "getId",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "getName",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "getCategory",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "getPrice",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "getWeightKg",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "equals",
+          "params": 1,
+          "cyclomatic": 3,
+          "cognitive": 2
+        },
+        {
+          "name": "hashCode",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        }
+      ]
+    },
+    {
+      "class": "ProductRepository",
+      "kind": "class",
+      "package": "com.kira.shop.infrastructure",
+      "file": "src/main/java/com/kira/shop/infrastructure/ProductRepository.java",
+      "WMC": 7,
+      "CBO": 2,
+      "Ca": 1,
+      "RFC": 13,
+      "LCOM": 0.0,
+      "LCOM4": 1,
+      "DIT": 1,
+      "NOC": 0,
+      "NOM": 5,
+      "NOF": 1,
+      "NMO": 0,
+      "NMA": 5,
+      "PIM": 5,
+      "overridden": [],
+      "maxCognitive": 3,
+      "maxCognitiveMethod": "findByCategory",
+      "couplesTo": [
+        "Category",
+        "Product"
+      ],
+      "usedBy": [
+        "StoreManager"
+      ],
+      "methods": [
+        {
+          "name": "save",
+          "params": 1,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "findById",
+          "params": 1,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "findAll",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "findByCategory",
+          "params": 1,
+          "cyclomatic": 3,
+          "cognitive": 3
+        },
+        {
+          "name": "count",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        }
+      ]
+    },
+    {
+      "class": "SalesReport",
+      "kind": "class",
+      "package": "com.kira.shop.report",
+      "file": "src/main/java/com/kira/shop/report/SalesReport.java",
+      "WMC": 11,
+      "CBO": 4,
+      "Ca": 1,
+      "RFC": 23,
+      "LCOM": 0.4,
+      "LCOM4": 3,
+      "DIT": 2,
+      "NOC": 1,
+      "NOM": 8,
+      "NOF": 2,
+      "NMO": 4,
+      "NMA": 4,
+      "PIM": 18,
+      "overridden": [
+        "header/0",
+        "formatRow/1",
+        "footer/0",
+        "clear/0"
+      ],
+      "maxCognitive": 1,
+      "maxCognitiveMethod": "addSale",
+      "couplesTo": [
+        "BaseReport",
+        "MoneyUtils",
+        "Order",
+        "OrderStatus"
+      ],
+      "usedBy": [
+        "MonthlySalesReport"
+      ],
+      "methods": [
+        {
+          "name": "SalesReport",
+          "params": 1,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "addSale",
+          "params": 1,
+          "cyclomatic": 2,
+          "cognitive": 1
+        },
+        {
+          "name": "getRevenue",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "getOrderCount",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "averageOrderValue",
+          "params": 0,
+          "cyclomatic": 2,
+          "cognitive": 1
+        },
+        {
+          "name": "header",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "formatRow",
+          "params": 1,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "footer",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "clear",
+          "params": 0,
+          "cyclomatic": 1,
+          "cognitive": 0
+        }
+      ]
+    },
+    {
+      "class": "StoreManager",
+      "kind": "class",
+      "package": "com.kira.shop.service",
+      "file": "src/main/java/com/kira/shop/service/StoreManager.java",
+      "WMC": 67,
+      "CBO": 19,
+      "Ca": 0,
+      "RFC": 141,
+      "LCOM": 0.855,
+      "LCOM4": 2,
+      "DIT": 1,
+      "NOC": 0,
+      "NOM": 29,
+      "NOF": 15,
+      "NMO": 0,
+      "NMA": 29,
+      "PIM": 19,
+      "overridden": [],
+      "maxCognitive": 5,
+      "maxCognitiveMethod": "resolveQuantity",
+      "couplesTo": [
+        "Address",
+        "Category",
+        "ConsoleNotificationSender",
+        "CsvUtils",
+        "Customer",
+        "CustomerTier",
+        "FakePaymentGateway",
+        "FileOrderRepository",
+        "InventoryStore",
+        "MoneyUtils",
+        "MonthlySalesReport",
+        "Order",
+        "OrderDto",
+        "OrderItem",
+        "OrderMapper",
+        "OrderStatus",
+        "PaymentResult",
+        "Product",
+        "ProductRepository"
+      ],
+      "usedBy": [],
+      "methods": [
+        {
+          "name": "StoreManager",
+          "params": 5,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "registerProduct",
+          "params": 2,
+          "cyclomatic": 2,
+          "cognitive": 1
+        },
+        {
+          "name": "restock",
+          "params": 2,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "isAvailable",
+          "params": 2,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "lowStockReport",
+          "params": 0,
+          "cyclomatic": 3,
+          "cognitive": 3
+        },
+        {
+          "name": "placeOrder",
+          "params": 2,
+          "cyclomatic": 3,
+          "cognitive": 2
+        },
+        {
+          "name": "resolveQuantity",
+          "params": 3,
+          "cyclomatic": 6,
+          "cognitive": 5
+        },
+        {
+          "name": "reserveStock",
+          "params": 1,
+          "cyclomatic": 2,
+          "cognitive": 1
+        },
+        {
+          "name": "findProduct",
+          "params": 1,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "isPremium",
+          "params": 1,
+          "cyclomatic": 2,
+          "cognitive": 1
+        },
+        {
+          "name": "requireArgument",
+          "params": 2,
+          "cyclomatic": 2,
+          "cognitive": 1
+        },
+        {
+          "name": "calculateDiscount",
+          "params": 2,
+          "cyclomatic": 6,
+          "cognitive": 3
+        },
+        {
+          "name": "calculateShipping",
+          "params": 2,
+          "cyclomatic": 5,
+          "cognitive": 4
+        },
+        {
+          "name": "payOrder",
+          "params": 1,
+          "cyclomatic": 3,
+          "cognitive": 2
+        },
+        {
+          "name": "shipOrder",
+          "params": 1,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "cancelOrder",
+          "params": 1,
+          "cyclomatic": 3,
+          "cognitive": 2
+        },
+        {
+          "name": "buildCustomerSummary",
+          "params": 1,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "buildCustomerSummaryForMonth",
+          "params": 2,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "summarize",
+          "params": 3,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "isCompleted",
+          "params": 1,
+          "cyclomatic": 2,
+          "cognitive": 1
+        },
+        {
+          "name": "isPremiumPurchase",
+          "params": 1,
+          "cyclomatic": 2,
+          "cognitive": 1
+        },
+        {
+          "name": "recommendTier",
+          "params": 2,
+          "cyclomatic": 5,
+          "cognitive": 5
+        },
+        {
+          "name": "applyCoupon",
+          "params": 2,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "generateCouponCode",
+          "params": 1,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "topProducts",
+          "params": 1,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "monthlyReport",
+          "params": 1,
+          "cyclomatic": 3,
+          "cognitive": 3
+        },
+        {
+          "name": "exportOrderLines",
+          "params": 0,
+          "cyclomatic": 2,
+          "cognitive": 1
+        },
+        {
+          "name": "exportOrders",
+          "params": 1,
+          "cyclomatic": 1,
+          "cognitive": 0
+        },
+        {
+          "name": "sendPromo",
+          "params": 2,
+          "cyclomatic": 3,
+          "cognitive": 2
+        },
+        {
+          "name": "requireOrder",
+          "params": 1,
+          "cyclomatic": 1,
+          "cognitive": 0
+        }
+      ]
+    }
+  ],
+  "mood": {
+    "MHF": 7.9,
+    "AHF": 100.0,
+    "MIF": 13.6,
+    "AIF": 0.0,
+    "COF": 9.3,
+    "PF": 31.2,
+    "classes": 22,
+    "methods": 140,
+    "attributes": 63,
+    "couplings": 43
+  },
+  "generatedAt": "2026-11-15T19:34:37+00:00",
+  "source": "src/main/java"
+}
