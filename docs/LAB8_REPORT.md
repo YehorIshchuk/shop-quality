@@ -40,23 +40,36 @@ curl -u $SONAR_TOKEN: "http://localhost:9000/api/measures/component?component=sh
 # ключі CK з методички -> "The following metric keys are not found"
 curl -u $SONAR_TOKEN: "http://localhost:9000/api/measures/component?component=shop-quality:src/main/java/com/kira/shop/domain/Order.java&metricKeys=class_complexity,coupling_between_objects,lcom4"
 ```
-PowerShell-еквівалент: `scripts/sonar-api-measures.ps1`. Скріншот/лог виконання: ⟨…⟩
+PowerShell-еквівалент: `scripts/sonar-api-measures.ps1`. Лог виконання:
+
+![curl-запити до Web API та відповідь not found для CK-ключів](lab8/img/01-api-requests.png)
+
 
 ### 1.2 Аналітичний JSON-пакет (фрагмент)
+
+Відповідь сервера на `GET /api/measures/component` для Core Domain-файлу (`reports/sonar-raw/curl-baseline/Order.json`):
 ```json
-⟨вставити з reports/sonar-raw/baseline/Order.json, наприклад:
-{ "component": { "key": "shop-quality:src/main/java/com/kira/shop/domain/Order.java",
-  "measures": [ {"metric": "complexity", "value": "…"}, {"metric": "cognitive_complexity", "value": "…"} ] } }⟩
+{"component":{"key":"shop-quality:src/main/java/com/kira/shop/domain/Order.java","name":"Order.java","qualifier":"FIL","path":"src/main/java/com/kira/shop/domain/Order.java","language":"java","measures":[{"metric":"complexity","value":"26"},{"metric":"code_smells","value":"0","bestValue":true},{"metric":"functions","value":"21"},{"metric":"cognitive_complexity","value":"5","bestValue":false},{"metric":"ncloc","value":"95"},{"metric":"sqale_index","value":"0","bestValue":true}]}}
+```
+
+Відповідь на запит із ключами CK з методички (`reports/sonar-raw/curl-baseline/ck-legacy-keys.json`):
+```json
+{"errors":[{"msg":"The following metric keys are not found: coupling_between_objects, class_complexity, lcom4"}]}
+```
+
+Відповідь для всього проєкту (`reports/sonar-raw/curl-baseline/project.json`):
+```json
+{"component":{"key":"shop-quality","name":"Shop Quality","qualifier":"TRK","measures":[{"metric":"complexity","value":"233"},{"metric":"code_smells","value":"0","bestValue":true},{"metric":"functions","value":"154"},{"metric":"cognitive_complexity","value":"72","bestValue":false},{"metric":"classes","value":"22"},{"metric":"ncloc","value":"1027"},{"metric":"sqale_index","value":"0","bestValue":true}]}}
 ```
 
 ### 1.3 Зведена таблиця CK & MOOD — Baseline (тег `lab8-baseline`)
 
 | Роль | Файл | WMC | Cognitive (Sonar) | CBO | Ca | RFC | LCOM | LCOM4 | DIT |
 |---|---|---|---|---|---|---|---|---|---|
-| Core Domain | `Order.java` | 26 | ⟨…⟩ | 4 | 5 | 34 | 0.857 | 1 | 1 |
-| Infrastructure | `FileOrderRepository.java` | 10 | ⟨…⟩ | 5 | 1 | 25 | 0.0 | 1 | 1 |
-| Utility / DTO | `OrderDto.java` | 6 | ⟨…⟩ | 0 | 3 | 6 | 0.0 | 0 | 1 |
-| **Епіцентр** | `StoreManager.java` | **67** | ⟨…⟩ | **19** | 0 | **141** | **0.855** | **2** | 1 |
+| Core Domain | `Order.java` | 26 | 5 | 4 | 5 | 34 | 0.857 | 1 | 1 |
+| Infrastructure | `FileOrderRepository.java` | 9 | 5 | 5 | 1 | 25 | 0.0 | 1 | 1 |
+| Utility / DTO | `OrderDto.java` | 6 | 0 | 0 | 3 | 6 | 0.0 | 0 | 1 |
+| **Епіцентр** | `StoreManager.java` | **77** | **38** | **19** | 0 | **141** | **0.855** | **2** | 1 |
 
 WMC = сума цикломатичної складності методів (збігається з `complexity` Sonar для файлу з одним класом).
 
@@ -64,12 +77,19 @@ WMC = сума цикломатичної складності методів (�
 |---|---|---|---|---|---|---|
 | Baseline | 7.9 % | 100 % | 13.6 % | 0 % | 9.3 % | 31.2 % |
 
+SonarQube Web API (проєкт, `project.json`): complexity 233, cognitive_complexity 72, ncloc 1027, classes 22, code smells 0, technical debt 0 хв, duplicated lines 0,0 %.
+
+
+![Зведена таблиця CK & MOOD](lab8/img/03-ck-mood-table.png)
+
+![Quality Gate PASSED — baseline](lab8/img/00-sonar-baseline.png)
+
 ### 1.4 Первинний вердикт
 - **Інкапсуляція полів зразкова** (AHF = 100 % — жодного публічного поля), **MHF низький** (7.9 %): майже всі
   методи публічні, приховані лише кілька хелперів — інтерфейси класів «широкі».
 - **COF = 9.3 %** для системи загалом прийнятний, але зачеплення розподілене вкрай нерівномірно:
   один клас `StoreManager` відповідає за 19 із ≈ 43 зв'язків системи.
-- `StoreManager` — **клас-мутант (God Object)**: CBO 19 (> 15), RFC 141, WMC 67, 29 методів,
+- `StoreManager` — **клас-мутант (God Object)**: CBO 19 (> 15), RFC 141, WMC 77 (Sonar complexity; 67 за CK-аналізатором), cognitive 38, 29 методів,
   LCOM 0.855 (методи працюють з різними підмножинами полів: склад, оплата, транзакції, статистика)
   і LCOM4 = 2 (клас розпадається на незв'язні частини).
 - `Order` має високий LCOM* (0.857) при LCOM4 = 1: це агрегат, у якого кожен метод зачіпає частину стану
@@ -105,11 +125,16 @@ StoreManager.java:141: error: ...                                               
 StoreManager.java:224: error: ...                                                          (cancelOrder)
 7 errors
 ```
+
+![Shotgun Surgery FAIL](lab8/img/04-shotgun-fail.png)
+
 Одна точкова зміна → 7 правок у 7 різних методах God Object, які відповідають за різні бізнес-задачі.
 Коміт: `arch(audit): capture god object coupling failure, FAIL`.
 
 ### 2.3 Інтерфейсна декомпозиція — тег `lab8-godobject-pass`
 Повна схема і таблиця метрик: [`docs/lab8/architecture-blueprint.md`](lab8/architecture-blueprint.md).
+![Architecture Blueprint](lab8/img/07-blueprint.png)
+
 
 - `StoreManager` видалено; його обов'язки розподілено за SRP між use-case сервісами
   (`OrderPlacementService`, `OrderPaymentService`, `OrderShippingService`, `OrderCancellationService`,
@@ -143,12 +168,31 @@ OO GATE: PASS
 | CBO | 19 | 8 (`OrderPlacementService`) | ≤ 8 ✅ |
 | LCOM (HS) | 0.855 | 0.0 | ≤ 0.2 ✅ |
 | LCOM4 | 2 | 1 (окрім stateless `PricingService` = 2) | 1 |
-| WMC | 67 | 13 (`StockAllocator`, `PricingService`, `CustomerInsightsService`) | — |
+| WMC | 77 (Sonar) / 67 (CK) | 13 (CK) (`StockAllocator`, `PricingService`, `CustomerInsightsService`) | — |
 | RFC | 141 | 41 (`CustomerInsightsService`) | — |
 | COF (система) | 9.3 % | 6.0 % | ↓ |
 
 Дані Sonar після рефакторингу (`python tools/sonar_api_report.py --stage god-object-pass --oo reports/oo/god-object-pass/oo-metrics.json`):
-⟨вставити таблицю з reports/god-object-pass/ck-mood-report.md + скріншот Quality Gate PASSED⟩
+**File level** (SonarQube Web API + CK analyzer)
+
+| Role | File | WMC (Sonar complexity) | Cognitive | NCLOC | CBO | Ca | RFC | LCOM (HS) | LCOM4 | DIT |
+|---|---|---|---|---|---|---|---|---|---|---|
+| Core Domain | `Order.java` | 26 | 5 | 95 | 4 | 16 | 34 | 0.857 | 1 | 1 |
+| Infrastructure | `FileOrderRepository.java` | 9 | 5 | 59 | 6 | 0 | 25 | 0.0 | 1 | 1 |
+| Utility/DTO | `OrderDto.java` | 6 | 0 | 31 | 0 | 2 | 6 | 0.0 | 0 | 1 |
+
+**Project level**
+
+| Sonar complexity | Cognitive | NCLOC | Classes | Code smells | Debt (min) | Dup % | MHF | AHF | COF |
+|---|---|---|---|---|---|---|---|---|---|
+| 249 | 70 | 1245 | 41 | 0 | 0 | 0.0 | 5.7% | 100.0% | 6.0% |
+
+
+
+
+![Quality Gate PASSED після декомпозиції](lab8/img/05-sonar-pass-godobject.png)
+
+![OO gate PASS](lab8/img/06-oo-gate-godobject.png)
 
 Матриця після рефакторингу: стовпці сервісів і адаптерів інфраструктури порожні — жоден сервіс не
 залежить від іншого сервісу чи конкретного адаптера, лише від портів.
@@ -175,6 +219,10 @@ OO GATE: PASS
 ```
 SalesReport.java:47: error: method does not override or implement a method from a supertype
 ```
+
+
+![Каскадний злам ієрархії FAIL](lab8/img/08-inheritance-fail.png)
+
 «Аварійне виправлення» (видалити `@Override` у нащадках) компілюється, але `formatRow(String[])`
 нащадків стає перевантаженням і більше не викликається з `BaseReport.render()` — рядки звіту
 втрачають оформлення **мовчки**. Це ловить характеризаційний тест:
@@ -229,6 +277,10 @@ PASS SalesReport:        CBO=4 DIT=1 NMO=0
 PASS MonthlySalesReport: CBO=4 DIT=1 NMO=0
 OO GATE: PASS
 ```
+
+
+![OO gate DIT/NMO PASS](lab8/img/10-oo-gate-inheritance.png)
+
 | | До | Після |
 |---|---|---|
 | DIT (`MonthlySalesReport`) | 3 | **1** |
@@ -236,7 +288,10 @@ OO GATE: PASS
 | PIM (`MonthlySalesReport`) | 19 | 7 |
 | MIF / PF (система) | 13.5 % / 31.2 % | 0 % / 0 % |
 
-⟨скріншот Quality Gate PASSED після сканування тегу `lab8-inheritance-pass`⟩
+![Quality Gate PASSED після композиції](lab8/img/09-sonar-pass-inheritance.png)
+
+
+
 
 ---
 
@@ -250,7 +305,9 @@ a33cc85 (tag: lab8-inheritance-baseline) arch(audit): capture inheritance hierar
 ccc663c (tag: lab8-godobject-fail)       arch(audit): capture god object coupling failure, FAIL
 8fac580 (tag: lab8-baseline)             arch(audit): capture OO design baseline (CK & MOOD metrics, coupling matrix)
 ```
-(хеші можуть відрізнятися — дивіться свій `git log`) ⟨скріншот дерева комітів⟩
 
-## Лог валідації ШІ-Техліда
-⟨Протокол згідно з інструкцією викладача — інструкції в методичці немає, додайте за вимогою⟩
+
+
+![Git History](lab8/img/11-git-log.png)
+
+
