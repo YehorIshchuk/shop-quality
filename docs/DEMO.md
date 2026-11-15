@@ -66,6 +66,7 @@ python tools/sonar_api_report.py --stage current --oo reports/oo/current/oo-metr
 ```bash
 ./scripts/oo-gate-god-object.sh check     # CBO <= 8, LCOM <= 0.2 для класів після декомпозиції
 ./scripts/oo-gate-inheritance.sh check    # DIT <= 1, NMO = 0 для класів звітів
+# Windows: .\scripts\oo-gate-god-object.ps1 check ; .\scripts\oo-gate-inheritance.ps1 check
 ```
 
 Стани FAIL ЛР8 (`lab8-godobject-fail`, `lab8-inheritance-fail`) **навмисно не компілюються** — їх показуємо через `git show <tag>` та логи `docs/lab8/*-build.log`; Sonar для них не запускається.
