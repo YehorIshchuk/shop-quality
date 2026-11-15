@@ -1,0 +1,7 @@
+classes=41  MHF=5.7%  AHF=100.0%  MIF=0.0%  AIF=0.0%  COF=6.2%  PF=0.0%
+max CBO: OrderPlacementService CBO=8 LCOM=0.0 LCOM4=1 WMC=5
+written: reports/oo/inheritance-pass/oo-metrics.json, oo-metrics.md, coupling-matrix.html|csv, dependency-graph.mmd
+  PASS ReportTable: CBO=0 LCOM=0.5 LCOM4=1 DIT=1 NMO=0
+  PASS SalesReport: CBO=4 LCOM=0.562 LCOM4=1 DIT=1 NMO=0
+  PASS MonthlySalesReport: CBO=4 LCOM=0.3 LCOM4=2 DIT=1 NMO=0
+OO GATE: PASS

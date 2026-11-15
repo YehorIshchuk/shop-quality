@@ -5,14 +5,20 @@ import com.kira.shop.domain.OrderStatus;
 import com.kira.shop.util.MoneyUtils;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.List;
+import java.util.function.UnaryOperator;
 
-/** Звіт продажів: додає облік виручки та перевизначає оформлення базового звіту. */
-public class SalesReport extends BaseReport {
+/** Звіт продажів. Не успадковує ReportTable, а містить його (композиція + DI через конструктор). */
+public class SalesReport {
+    private final String title;
+    private final ReportTable table;
     private BigDecimal revenue = BigDecimal.ZERO;
     private int orderCount;
 
-    public SalesReport(String title) {
-        super(title);
+    public SalesReport(String title, ReportTable table) {
+        this.title = title;
+        this.table = table;
     }
 
     public void addSale(Order order) {
@@ -21,7 +27,11 @@ public class SalesReport extends BaseReport {
         }
         revenue = revenue.add(order.total());
         orderCount++;
-        addRow(order.getId(), order.getCustomer().getName(), MoneyUtils.format(order.total()));
+        table.addRow(List.of(order.getId(), order.getCustomer().getName(), MoneyUtils.format(order.total())));
+    }
+
+    public String getTitle() {
+        return title;
     }
 
     public BigDecimal getRevenue() {
@@ -32,31 +42,40 @@ public class SalesReport extends BaseReport {
         return orderCount;
     }
 
+    public boolean isEmpty() {
+        return table.isEmpty();
+    }
+
     public BigDecimal averageOrderValue() {
         if (orderCount == 0) {
             return BigDecimal.ZERO;
         }
-        return MoneyUtils.round(revenue.divide(BigDecimal.valueOf(orderCount), 4, java.math.RoundingMode.HALF_UP));
+        return MoneyUtils.round(revenue.divide(BigDecimal.valueOf(orderCount), 4, RoundingMode.HALF_UP));
     }
 
-    @Override
     public String header() {
-        return "*** SALES: " + getTitle() + " ***";
+        return "*** SALES: " + title + " ***";
     }
 
-    @Override
-    public String formatRow(String[] cells) {
-        return "- " + String.join(getSeparator(), cells);
-    }
-
-    @Override
     public String footer() {
         return "Orders: " + orderCount + ", revenue: " + MoneyUtils.format(revenue);
     }
 
-    @Override
+    public String render() {
+        return renderWith(header(), footer(), row -> row);
+    }
+
+    /** Точка розширення для звітів-обгорток: власні заголовок/підсумок і префікс рядка. */
+    public String renderWith(String customHeader, String customFooter, UnaryOperator<String> rowPrefix) {
+        return table.render(customHeader, customFooter, row -> rowPrefix.apply("- " + row));
+    }
+
+    public String renderCsv() {
+        return table.renderCsv();
+    }
+
     public void clear() {
-        super.clear();
+        table.clear();
         revenue = BigDecimal.ZERO;
         orderCount = 0;
     }

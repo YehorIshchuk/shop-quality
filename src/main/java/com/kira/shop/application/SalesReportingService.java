@@ -18,7 +18,7 @@ public class SalesReportingService {
     }
 
     public String monthlyReport(YearMonth month) {
-        MonthlySalesReport report = new MonthlySalesReport(month);
+        MonthlySalesReport report = MonthlySalesReport.of(month);
         orders.findAll().stream().filter(order -> order.getStatus() != OrderStatus.NEW).forEach(report::addSale);
         return report.render();
     }

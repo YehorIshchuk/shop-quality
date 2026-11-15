@@ -5,51 +5,51 @@ import com.kira.shop.util.MoneyUtils;
 
 import java.time.YearMonth;
 
-/** Місячний звіт продажів — третій рівень ієрархії, перевизначає більшість батьківської логіки. */
-public class MonthlySalesReport extends SalesReport {
+/** Місячний звіт: обгортка над SalesReport (композиція), фільтрує продажі за місяцем. */
+public class MonthlySalesReport {
     private final YearMonth month;
+    private final SalesReport sales;
 
-    public MonthlySalesReport(YearMonth month) {
-        super("Sales for " + month);
+    public MonthlySalesReport(YearMonth month, SalesReport sales) {
         this.month = month;
+        this.sales = sales;
+    }
+
+    /** Фабрика зі стандартним складом компонентів. */
+    public static MonthlySalesReport of(YearMonth month) {
+        return new MonthlySalesReport(month, new SalesReport("Sales for " + month, new ReportTable(" | ")));
     }
 
     public YearMonth getMonth() {
         return month;
     }
 
-    @Override
+    public int getOrderCount() {
+        return sales.getOrderCount();
+    }
+
     public void addSale(Order order) {
         if (YearMonth.from(order.getCreatedAt()).equals(month)) {
-            super.addSale(order);
+            sales.addSale(order);
         }
     }
 
-    @Override
     public String header() {
         return "*** MONTHLY SALES " + month + " ***";
     }
 
-    @Override
-    public String formatRow(String[] cells) {
-        return month + " " + super.formatRow(cells);
-    }
-
-    @Override
     public String footer() {
-        return super.footer() + ", avg: " + MoneyUtils.format(averageOrderValue());
+        return sales.footer() + ", avg: " + MoneyUtils.format(sales.averageOrderValue());
     }
 
-    @Override
-    public String renderCsv() {
-        return "month;" + month + "\n" + super.renderCsv();
-    }
-
-    @Override
     public String render() {
-        if (isEmpty()) {
+        if (sales.isEmpty()) {
             return header() + "\nNo sales in " + month;
         }
-        return super.render();
+        return sales.renderWith(header(), footer(), row -> month + " " + row);
+    }
+
+    public String renderCsv() {
+        return "month;" + month + "\n" + sales.renderCsv();
     }
 }
