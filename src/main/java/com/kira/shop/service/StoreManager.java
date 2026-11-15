@@ -22,6 +22,7 @@ import com.kira.shop.util.MoneyUtils;
 
 import java.math.BigDecimal;
 import java.nio.file.Path;
+import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.ArrayList;
@@ -30,7 +31,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Random;
+import java.util.function.Predicate;
 
 /**
  * Центральний сервіс магазину: каталог, склад, замовлення, оплата,
@@ -39,6 +40,9 @@ import java.util.Random;
 public class StoreManager {
     private static final BigDecimal FREE_SHIPPING_THRESHOLD = new BigDecimal("2000");
     private static final int LOW_STOCK_LEVEL = 3;
+    private static final Map<String, BigDecimal> COUPON_RATES = Map.of(
+            "WELCOME10", new BigDecimal("0.10"),
+            "BLACKFRIDAY", new BigDecimal("0.25"));
 
     private final ProductRepository productRepository;
     private final InventoryStore inventory;
@@ -47,6 +51,7 @@ public class StoreManager {
     private final ConsoleNotificationSender notificationSender;
     private final Map<String, String> transactions = new HashMap<>();
     private final Map<String, Integer> soldByProduct = new HashMap<>();
+    private final SecureRandom random = new SecureRandom();
     private int orderSequence = 1;
 
     public StoreManager(ProductRepository productRepository, InventoryStore inventory,
@@ -217,59 +222,21 @@ public class StoreManager {
 
     /** Формує текстове резюме клієнта з усіма його замовленнями та рекомендацією рівня. */
     public String buildCustomerSummary(Customer customer) {
-        StringBuilder sb = new StringBuilder();
-        BigDecimal spent = BigDecimal.ZERO;
-        int paid = 0;
-        int cancelled = 0;
-        for (Order order : orderRepository.findAll()) {
-            if (order.getCustomer().getId().equals(customer.getId())) {
-                if (order.getStatus() == OrderStatus.CANCELLED) {
-                    cancelled++;
-                } else {
-                    if (order.getStatus() != OrderStatus.NEW) {
-                        paid++;
-                        spent = spent.add(order.total());
-                        for (OrderItem item : order.getItems()) {
-                            if (item.getProduct().getCategory() == Category.ELECTRONICS) {
-                                if (item.lineTotal().compareTo(new BigDecimal("10000")) > 0) {
-                                    sb.append("Premium purchase: ").append(item.getProduct().getName()).append('\n');
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        sb.append("Customer: ").append(customer.getName()).append('\n');
-        sb.append("Paid orders: ").append(paid).append(", cancelled: ").append(cancelled).append('\n');
-        sb.append("Spent: ").append(MoneyUtils.format(spent)).append('\n');
-        if (spent.compareTo(new BigDecimal("50000")) > 0) {
-            if (customer.getTier() != CustomerTier.PLATINUM) {
-                sb.append("Recommendation: upgrade to PLATINUM");
-            } else {
-                sb.append("Recommendation: keep PLATINUM");
-            }
-        } else if (spent.compareTo(new BigDecimal("20000")) > 0) {
-            if (customer.getTier() == CustomerTier.REGULAR || customer.getTier() == CustomerTier.SILVER) {
-                sb.append("Recommendation: upgrade to GOLD");
-            } else {
-                sb.append("Recommendation: keep ").append(customer.getTier());
-            }
-        } else {
-            sb.append("Recommendation: keep ").append(customer.getTier());
-        }
-        return sb.toString();
+        return summarize(customer, order -> true, "");
     }
 
     /** Те саме резюме, але лише за обраний місяць (для щомісячної розсилки). */
     public String buildCustomerSummaryForMonth(Customer customer, YearMonth month) {
+        return summarize(customer, order -> YearMonth.from(order.getCreatedAt()).equals(month), " (" + month + ")");
+    }
+
+    private String summarize(Customer customer, Predicate<Order> filter, String label) {
         StringBuilder sb = new StringBuilder();
         BigDecimal spent = BigDecimal.ZERO;
         int paid = 0;
         int cancelled = 0;
         for (Order order : orderRepository.findAll()) {
-            if (order.getCustomer().getId().equals(customer.getId())
-                    && YearMonth.from(order.getCreatedAt()).equals(month)) {
+            if (order.getCustomer().getId().equals(customer.getId()) && filter.test(order)) {
                 if (order.getStatus() == OrderStatus.CANCELLED) {
                     cancelled++;
                 } else {
@@ -287,7 +254,7 @@ public class StoreManager {
                 }
             }
         }
-        sb.append("Customer: ").append(customer.getName()).append(" (").append(month).append(")").append('\n');
+        sb.append("Customer: ").append(customer.getName()).append(label).append('\n');
         sb.append("Paid orders: ").append(paid).append(", cancelled: ").append(cancelled).append('\n');
         sb.append("Spent: ").append(MoneyUtils.format(spent)).append('\n');
         if (spent.compareTo(new BigDecimal("50000")) > 0) {
@@ -312,19 +279,13 @@ public class StoreManager {
 
     public BigDecimal applyCoupon(String orderId, String code) {
         Order order = requireOrder(orderId);
-        BigDecimal rate = BigDecimal.ZERO;
-        if (code == "WELCOME10") {
-            rate = new BigDecimal(0.1);
-        } else if (code == "BLACKFRIDAY") {
-            rate = new BigDecimal(0.25);
-        }
+        BigDecimal rate = COUPON_RATES.getOrDefault(code, BigDecimal.ZERO);
         BigDecimal extra = MoneyUtils.round(order.subtotal().multiply(rate));
         order.applyDiscount(order.getDiscount().add(extra));
         return extra;
     }
 
     public String generateCouponCode(Customer customer) {
-        Random random = new Random();
         return customer.getId() + "-" + (100000 + random.nextInt(900000));
     }
 
