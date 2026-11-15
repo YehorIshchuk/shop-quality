@@ -54,7 +54,7 @@ public class BaseReport {
         return "=== " + title + " ===";
     }
 
-    public String formatRow(String[] cells) {
+    public String formatRow(List<String> cells) {
         return String.join(separator, cells);
     }
 
@@ -65,7 +65,7 @@ public class BaseReport {
     public String render() {
         StringBuilder sb = new StringBuilder(header()).append('\n');
         for (String[] row : rows) {
-            sb.append(formatRow(row)).append('\n');
+            sb.append(formatRow(List.of(row))).append('\n');
         }
         return sb.append(footer()).toString();
     }

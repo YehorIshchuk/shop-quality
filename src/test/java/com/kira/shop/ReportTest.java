@@ -48,4 +48,15 @@ class ReportTest {
         MonthlySalesReport report = new MonthlySalesReport(YearMonth.of(2026, 1));
         assertTrue(report.render().contains("No sales in 2026-01"));
     }
+
+    @Test
+    void rowsAreDecoratedByConcreteReport() {
+        SalesReport sales = new SalesReport("All");
+        sales.addSale(paidOrder("O1", LocalDate.of(2026, 11, 3)));
+        assertTrue(sales.render().contains("\n- O1 | Client SILVER | 1000.00 UAH\n"));
+
+        MonthlySalesReport monthly = new MonthlySalesReport(YearMonth.of(2026, 11));
+        monthly.addSale(paidOrder("O2", LocalDate.of(2026, 11, 4)));
+        assertTrue(monthly.render().contains("\n2026-11 - O2 | Client SILVER | 1000.00 UAH\n"));
+    }
 }

@@ -1,0 +1,12 @@
+$ mvn -q compile   # (javac --release 17, той самий результат)
+src/main/java/com/kira/shop/report/SalesReport.java:47: error: method does not override or implement a method from a supertype
+    @Override
+    ^
+1 error
+
+# Спроба 'аварійного виправлення': видалити @Override у нащадках -> компіляція проходить,
+# але SalesReport/MonthlySalesReport.formatRow(String[]) більше не викликаються з BaseReport.render()
+# (тепер це перевантаження, а не перевизначення) -> регресія поведінки, ловиться тестами:
+
+FAIL com.kira.shop.ReportTest.rowsAreDecoratedByConcreteReport: java.lang.AssertionError: expected true
+Tests passed: 20, failed: 1
