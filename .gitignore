@@ -6,3 +6,6 @@ target/
 .env
 reports/sonar-raw/*.json
 !reports/sonar-raw/.gitkeep
+reports/oo/check/
+reports/oo/current/
+reports/current/
