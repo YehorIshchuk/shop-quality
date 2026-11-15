@@ -1,0 +1,24 @@
+$ mvn -q compile   # (javac --release 17, той самий результат)
+src/main/java/com/kira/shop/service/StoreManager.java:74: error: incompatible types: String cannot be converted to Product
+            inventory.add(product.getId(), initialStock);
+                                       ^
+src/main/java/com/kira/shop/service/StoreManager.java:79: error: incompatible types: String cannot be converted to Product
+        inventory.add(findProduct(productId).getId(), quantity);
+                                                  ^
+src/main/java/com/kira/shop/service/StoreManager.java:83: error: incompatible types: String cannot be converted to Product
+        return inventory.getStock(productId) >= quantity;
+                                  ^
+src/main/java/com/kira/shop/service/StoreManager.java:89: error: incompatible types: String cannot be converted to Product
+            int stock = inventory.getStock(product.getId());
+                                                        ^
+src/main/java/com/kira/shop/service/StoreManager.java:126: error: incompatible types: String cannot be converted to Product
+        int available = inventory.getStock(product.getId());
+                                                        ^
+src/main/java/com/kira/shop/service/StoreManager.java:141: error: incompatible types: String cannot be converted to Product
+            inventory.reserve(item.getProduct().getId(), item.getQuantity());
+                                                     ^
+src/main/java/com/kira/shop/service/StoreManager.java:224: error: incompatible types: String cannot be converted to Product
+            inventory.release(item.getProduct().getId(), item.getQuantity());
+                                                     ^
+Note: Some messages have been simplified; recompile with -Xdiags:verbose to get full output
+7 errors
