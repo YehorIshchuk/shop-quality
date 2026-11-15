@@ -3,7 +3,10 @@ package com.kira.shop.infrastructure;
 import java.util.HashMap;
 import java.util.Map;
 
-/** Облік складських залишків. */
+/**
+ * Облік складських залишків.
+ * Ключ — ідентифікатор товару, значення — кількість одиниць на складі.
+ */
 public class InventoryStore {
     private final Map<String, Integer> stock = new HashMap<>();
 
