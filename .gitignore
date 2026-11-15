@@ -1,0 +1,8 @@
+target/
+.scannerwork/
+.idea/
+*.iml
+.vscode/
+.env
+reports/sonar-raw/*.json
+!reports/sonar-raw/.gitkeep
