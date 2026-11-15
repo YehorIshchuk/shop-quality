@@ -30,7 +30,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Predicate;
 
 /**
@@ -40,6 +39,9 @@ import java.util.function.Predicate;
 public class StoreManager {
     private static final BigDecimal FREE_SHIPPING_THRESHOLD = new BigDecimal("2000");
     private static final int LOW_STOCK_LEVEL = 3;
+    private static final BigDecimal PREMIUM_PURCHASE = new BigDecimal("10000");
+    private static final BigDecimal GOLD_THRESHOLD = new BigDecimal("20000");
+    private static final BigDecimal PLATINUM_THRESHOLD = new BigDecimal("50000");
     private static final Map<String, BigDecimal> COUPON_RATES = Map.of(
             "WELCOME10", new BigDecimal("0.10"),
             "BLACKFRIDAY", new BigDecimal("0.25"));
@@ -74,9 +76,7 @@ public class StoreManager {
     }
 
     public void restock(String productId, int quantity) {
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new IllegalArgumentException("Unknown product " + productId));
-        inventory.add(product.getId(), quantity);
+        inventory.add(findProduct(productId).getId(), quantity);
     }
 
     public boolean isAvailable(String productId, int quantity) {
@@ -101,48 +101,59 @@ public class StoreManager {
      * рахує знижку і доставку, зберігає та повідомляє клієнта.
      */
     public Order placeOrder(Customer customer, Map<String, Integer> cart) {
-        if (customer != null) {
-            if (cart != null && !cart.isEmpty()) {
-                Order order = new Order("ORD-" + (orderSequence++), customer, LocalDate.now());
-                for (Map.Entry<String, Integer> entry : cart.entrySet()) {
-                    Optional<Product> product = productRepository.findById(entry.getKey());
-                    if (product.isPresent()) {
-                        if (entry.getValue() != null && entry.getValue() > 0) {
-                            if (inventory.getStock(product.get().getId()) >= entry.getValue()) {
-                                order.addItem(product.get(), entry.getValue());
-                            } else {
-                                if (customer.getTier() == CustomerTier.GOLD || customer.getTier() == CustomerTier.PLATINUM) {
-                                    int available = inventory.getStock(product.get().getId());
-                                    if (available > 0) {
-                                        order.addItem(product.get(), available);
-                                    } else {
-                                        throw new IllegalStateException("Out of stock: " + entry.getKey());
-                                    }
-                                } else {
-                                    throw new IllegalStateException("Not enough stock: " + entry.getKey());
-                                }
-                            }
-                        } else {
-                            throw new IllegalArgumentException("Bad quantity for " + entry.getKey());
-                        }
-                    } else {
-                        throw new IllegalArgumentException("Unknown product " + entry.getKey());
-                    }
-                }
-                for (OrderItem item : order.getItems()) {
-                    inventory.reserve(item.getProduct().getId(), item.getQuantity());
-                }
-                order.applyDiscount(calculateDiscount(customer, order));
-                order.setShippingCost(calculateShipping(customer.getAddress(), order));
-                orderRepository.save(order);
-                notificationSender.send(customer.getEmail(), "Order " + order.getId(),
-                        "Total: " + MoneyUtils.format(order.total()));
-                return order;
-            } else {
-                throw new IllegalArgumentException("Cart is empty");
-            }
-        } else {
-            throw new IllegalArgumentException("Customer is required");
+        requireArgument(customer != null, "Customer is required");
+        requireArgument(cart != null && !cart.isEmpty(), "Cart is empty");
+
+        Order order = new Order("ORD-" + (orderSequence++), customer, LocalDate.now());
+        for (Map.Entry<String, Integer> entry : cart.entrySet()) {
+            Product product = findProduct(entry.getKey());
+            order.addItem(product, resolveQuantity(customer, product, entry.getValue()));
+        }
+        reserveStock(order);
+        order.applyDiscount(calculateDiscount(customer, order));
+        order.setShippingCost(calculateShipping(customer.getAddress(), order));
+        orderRepository.save(order);
+        notificationSender.send(customer.getEmail(), "Order " + order.getId(),
+                "Total: " + MoneyUtils.format(order.total()));
+        return order;
+    }
+
+    /** Скільки одиниць можна додати: запитане, або залишок для преміум-клієнтів. */
+    private int resolveQuantity(Customer customer, Product product, Integer requested) {
+        if (requested == null || requested <= 0) {
+            throw new IllegalArgumentException("Bad quantity for " + product.getId());
+        }
+        int available = inventory.getStock(product.getId());
+        if (available >= requested) {
+            return requested;
+        }
+        if (!isPremium(customer)) {
+            throw new IllegalStateException("Not enough stock: " + product.getId());
+        }
+        if (available == 0) {
+            throw new IllegalStateException("Out of stock: " + product.getId());
+        }
+        return available;
+    }
+
+    private void reserveStock(Order order) {
+        for (OrderItem item : order.getItems()) {
+            inventory.reserve(item.getProduct().getId(), item.getQuantity());
+        }
+    }
+
+    private Product findProduct(String productId) {
+        return productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("Unknown product " + productId));
+    }
+
+    private static boolean isPremium(Customer customer) {
+        return customer.getTier() == CustomerTier.GOLD || customer.getTier() == CustomerTier.PLATINUM;
+    }
+
+    private static void requireArgument(boolean condition, String message) {
+        if (!condition) {
+            throw new IllegalArgumentException(message);
         }
     }
 
@@ -231,48 +242,43 @@ public class StoreManager {
     }
 
     private String summarize(Customer customer, Predicate<Order> filter, String label) {
+        List<Order> orders = orderRepository.findAll().stream()
+                .filter(order -> order.getCustomer().getId().equals(customer.getId()))
+                .filter(filter)
+                .toList();
+        List<Order> completed = orders.stream().filter(StoreManager::isCompleted).toList();
+        long cancelled = orders.stream().filter(order -> order.getStatus() == OrderStatus.CANCELLED).count();
+        BigDecimal spent = completed.stream().map(Order::total).reduce(BigDecimal.ZERO, BigDecimal::add);
+
         StringBuilder sb = new StringBuilder();
-        BigDecimal spent = BigDecimal.ZERO;
-        int paid = 0;
-        int cancelled = 0;
-        for (Order order : orderRepository.findAll()) {
-            if (order.getCustomer().getId().equals(customer.getId()) && filter.test(order)) {
-                if (order.getStatus() == OrderStatus.CANCELLED) {
-                    cancelled++;
-                } else {
-                    if (order.getStatus() != OrderStatus.NEW) {
-                        paid++;
-                        spent = spent.add(order.total());
-                        for (OrderItem item : order.getItems()) {
-                            if (item.getProduct().getCategory() == Category.ELECTRONICS) {
-                                if (item.lineTotal().compareTo(new BigDecimal("10000")) > 0) {
-                                    sb.append("Premium purchase: ").append(item.getProduct().getName()).append('\n');
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        completed.stream()
+                .flatMap(order -> order.getItems().stream())
+                .filter(StoreManager::isPremiumPurchase)
+                .forEach(item -> sb.append("Premium purchase: ").append(item.getProduct().getName()).append('\n'));
         sb.append("Customer: ").append(customer.getName()).append(label).append('\n');
-        sb.append("Paid orders: ").append(paid).append(", cancelled: ").append(cancelled).append('\n');
+        sb.append("Paid orders: ").append(completed.size()).append(", cancelled: ").append(cancelled).append('\n');
         sb.append("Spent: ").append(MoneyUtils.format(spent)).append('\n');
-        if (spent.compareTo(new BigDecimal("50000")) > 0) {
-            if (customer.getTier() != CustomerTier.PLATINUM) {
-                sb.append("Recommendation: upgrade to PLATINUM");
-            } else {
-                sb.append("Recommendation: keep PLATINUM");
-            }
-        } else if (spent.compareTo(new BigDecimal("20000")) > 0) {
-            if (customer.getTier() == CustomerTier.REGULAR || customer.getTier() == CustomerTier.SILVER) {
-                sb.append("Recommendation: upgrade to GOLD");
-            } else {
-                sb.append("Recommendation: keep ").append(customer.getTier());
-            }
-        } else {
-            sb.append("Recommendation: keep ").append(customer.getTier());
-        }
+        sb.append("Recommendation: ").append(recommendTier(customer.getTier(), spent));
         return sb.toString();
+    }
+
+    private static boolean isCompleted(Order order) {
+        return order.getStatus() != OrderStatus.CANCELLED && order.getStatus() != OrderStatus.NEW;
+    }
+
+    private static boolean isPremiumPurchase(OrderItem item) {
+        return item.getProduct().getCategory() == Category.ELECTRONICS
+                && item.lineTotal().compareTo(PREMIUM_PURCHASE) > 0;
+    }
+
+    static String recommendTier(CustomerTier current, BigDecimal spent) {
+        if (spent.compareTo(PLATINUM_THRESHOLD) > 0) {
+            return current == CustomerTier.PLATINUM ? "keep PLATINUM" : "upgrade to PLATINUM";
+        }
+        if (spent.compareTo(GOLD_THRESHOLD) > 0 && current.compareTo(CustomerTier.GOLD) < 0) {
+            return "upgrade to GOLD";
+        }
+        return "keep " + current;
     }
 
     // ------------------------------------------------------------ coupons
