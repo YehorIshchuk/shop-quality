@@ -98,7 +98,7 @@ flowchart LR
 | build + test + coverage | `mvn -B clean verify` | кожен коміт (вручну) | усі тести зелені |
 | SAST | `scripts/scan.sh` (`sonar:sonar`, `sonar.qualitygate.wait=true`) | перед push, на кожному тезі | «Shop-Quality-Gate»: new bugs = 0, new hotspots reviewed = 100 %, duplicated lines ≤ 3 %, Maintainability = A |
 | OO-гейти (ЛР8) | `scripts/oo-gate-god-object.sh check`, `scripts/oo-gate-inheritance.sh check` | зміни в `application/`, `report/` | CBO ≤ 8, LCOM ≤ 0.2, DIT ≤ 1, NMO = 0 |
-| Doc-гейт (ЛР10) | `python3 tools/doc_audit.py --gate` | кожна зміна коду (правило «зміна коду = зміна документації») | `DOC CURRENCY GATE: PASS` |
+| Doc-гейт (ЛР10) | `python3 tools/doc_audit.py --gate` | кожна зміна коду (правило [maintenance.md](maintenance.md)) | `DOC CURRENCY GATE: PASS` |
 | реліз | `git tag -a <name> && git push --follow-tags` | стан лабораторної | усі гейти PASS |
 
 <a id="d4"></a>

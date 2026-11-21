@@ -8,6 +8,7 @@
     "docs/isd.md",
     "docs/architecture/adr/0001-hexagonal-ports-and-adapters.md",
     "docs/architecture/adr/0002-in-memory-storage-with-csv-export.md",
+    "docs/maintenance.md",
     "docs/DEMO.md",
     "docs/LAB1_REPORT.md",
     "docs/LAB8_REPORT.md",

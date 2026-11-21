@@ -10,7 +10,7 @@ last_reviewed: 2026-11-21
 # SDD — System Design Document: Shop Quality
 
 > **Як влаштована система всередині.** Де і на чому вона працює — [ISD](isd.md).
-> Чому рішення саме такі — [ADR](architecture/adr/).
+> Чому рішення саме такі — [ADR](architecture/adr/). Регламент супроводу — [maintenance.md](maintenance.md).
 
 ## 1. Призначення та межі системи
 

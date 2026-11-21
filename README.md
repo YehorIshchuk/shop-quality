@@ -28,7 +28,7 @@ java -cp target/classes com.kira.shop.ShopApplication  # демо-сценарі
 3. **[docs/isd.md](docs/isd.md)**: де вона працює. Середовища, змінні оточення, конвеєр якості, RTO/RPO.
 4. **[docs/architecture/adr/](docs/architecture/adr/)**: чому рішення саме такі.
 5. Перша зміна: тест у `src/test/java` → код → `mvn verify` → оновлення документів за правилом
-   «зміна коду = зміна документації» → `python3 tools/doc_audit.py --gate`.
+   «зміна коду = зміна документації» ([docs/maintenance.md](docs/maintenance.md)) → `python3 tools/doc_audit.py --gate`.
 
 ## Конвеєр якості (SonarQube, OO-гейти, doc-гейт)
 
@@ -55,6 +55,7 @@ Windows (PowerShell): ті самі скрипти з розширенням `.p
 | [docs/sdd.md](docs/sdd.md) | продукт · архітектурна | розробники, QA | Yehor Ishchuk |
 | [docs/isd.md](docs/isd.md) | продукт · експлуатаційна | DevOps | Yehor Ishchuk |
 | [docs/architecture/adr/](docs/architecture/adr/) | продукт · архітектурна | розробники, архітектор | Yehor Ishchuk |
+| [docs/maintenance.md](docs/maintenance.md) | процес · регламент | уся команда | Yehor Ishchuk |
 | [docs/LAB1_REPORT.md](docs/LAB1_REPORT.md), [LAB8](docs/LAB8_REPORT.md) | процес (історичні звіти) | викладач | Yehor Ishchuk |
 | [docs/DEMO.md](docs/DEMO.md) | процес · **deprecated** | відтворення станів ЛР1/ЛР8 | Yehor Ishchuk |
 
