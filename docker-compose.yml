@@ -1,4 +1,5 @@
-# SonarQube Community Edition для локального аналізу.
+# SonarQube Community Edition — АЛЬТЕРНАТИВНИЙ спосіб для Linux/Windows із Docker.
+# Основне розгортання (macOS, без Docker): SonarQube із ZIP на JDK 21 — див. docs/isd.md, вузол D4.
 # Запуск:  docker compose up -d     ->  http://localhost:9000  (admin / admin, далі змінити пароль)
 services:
   sonarqube:

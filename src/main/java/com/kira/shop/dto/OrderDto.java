@@ -2,7 +2,7 @@ package com.kira.shop.dto;
 
 import java.math.BigDecimal;
 
-/** Плоске представлення замовлення для експорту та API. */
+/** Плоске представлення замовлення для CSV-експорту та звітів. */
 public final class OrderDto {
     private final String orderId;
     private final String customerName;

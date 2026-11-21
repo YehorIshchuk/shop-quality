@@ -18,7 +18,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-/** Сховище замовлень з можливістю експорту у CSV-файл. */
+/**
+ * In-memory сховище замовлень з експортом у CSV-файл ({@link #exportCsv(Path)}).
+ * Назва історична: дані з файлу не читаються, вони живуть у пам'яті процесу (ADR-0002).
+ */
 public class FileOrderRepository implements OrderStore {
     private static final String HEADER = "order_id;customer;status;items;total";
     private final Map<String, Order> orders = new LinkedHashMap<>();
