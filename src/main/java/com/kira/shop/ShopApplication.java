@@ -1,5 +1,6 @@
 package com.kira.shop;
 
+import com.kira.shop.api.ShopHttpApi;
 import com.kira.shop.application.CatalogService;
 import com.kira.shop.application.CustomerInsightsService;
 import com.kira.shop.application.OrderPaymentService;
@@ -26,11 +27,13 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 /**
- * Демонстраційна точка входу та Composition Root: тільки тут конкретні реалізації
- * зв'язуються з інтерфейсами (Dependency Injection через конструктори).
+ * Точка входу та Composition Root: тільки тут конкретні реалізації зв'язуються з інтерфейсами
+ * (Dependency Injection через конструктори). Після демо-сценарію піднімає HTTP API замовлень
+ * на порту {@code SHOP_HTTP_PORT} (за замовчуванням 8080) і працює до Ctrl+C.
  */
 public final class ShopApplication {
     private static final Logger LOG = Logger.getLogger(ShopApplication.class.getName());
+    private static final int DEFAULT_HTTP_PORT = 8080;
 
     private ShopApplication() {
     }
@@ -56,5 +59,15 @@ public final class ShopApplication {
         payments.pay(order.getId());
         LOG.info(new SalesReportingService(orders).monthlyReport(YearMonth.now()));
         LOG.info(new CustomerInsightsService(orders).buildCustomerSummary(kira));
+
+        ShopHttpApi api = new ShopHttpApi(orders, httpPort());
+        api.start();
+        Runtime.getRuntime().addShutdownHook(new Thread(api::stop));
+        LOG.info(() -> "HTTP API listening on http://localhost:" + api.port() + "/api/orders (Ctrl+C to stop)");
+    }
+
+    private static int httpPort() {
+        String value = System.getenv("SHOP_HTTP_PORT");
+        return value == null || value.isBlank() ? DEFAULT_HTTP_PORT : Integer.parseInt(value.trim());
     }
 }
