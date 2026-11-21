@@ -1,0 +1,29 @@
+{
+  "_comment": "Карта документації для tools/doc_audit.py. documents — інвентар носіїв знань; components — який документ відповідає за який код (правило «зміна коду = зміна документації»). Стан: baseline (до архітектурного паспорта).",
+  "sdd": "docs/sdd.md",
+  "isd": "docs/isd.md",
+  "documents": [
+    "README.md",
+    "docs/DEMO.md",
+    "docs/LAB1_REPORT.md",
+    "docs/LAB8_REPORT.md",
+    "docs/lab8/architecture-blueprint.md",
+    "docs/lab8/shotgun-surgery-build.log",
+    "docs/lab8/inheritance-crash-build.log",
+    "docker-compose.yml",
+    "sonar-project.properties",
+    "pom.xml",
+    "tools/requirements.txt",
+    "docs/sdd.md",
+    "docs/isd.md",
+    "docs/architecture/adr"
+  ],
+  "components": [
+    {"name": "Domain", "path": "src/main/java/com/kira/shop/domain", "doc": "README.md"},
+    {"name": "Application services", "path": "src/main/java/com/kira/shop/application", "doc": "README.md"},
+    {"name": "Infrastructure adapters", "path": "src/main/java/com/kira/shop/infrastructure", "doc": "README.md"},
+    {"name": "Reports", "path": "src/main/java/com/kira/shop/report", "doc": "README.md"},
+    {"name": "Build & pipeline scripts", "path": "scripts", "doc": "README.md"},
+    {"name": "Audit tools", "path": "tools", "doc": "README.md"}
+  ]
+}
