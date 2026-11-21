@@ -10,6 +10,7 @@
     "docs/architecture/adr/0002-in-memory-storage-with-csv-export.md",
     "docs/architecture/adr/0003-embedded-jdk-http-server.md",
     "docs/maintenance.md",
+    "docs/handover.md",
     "docs/DEMO.md",
     "docs/LAB1_REPORT.md",
     "docs/LAB8_REPORT.md",

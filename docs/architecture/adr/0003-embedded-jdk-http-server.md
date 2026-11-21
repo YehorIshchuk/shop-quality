@@ -6,7 +6,7 @@
 - **Автор / власник:** Yehor Ishchuk
 - **Зв'язок:** не скасовує [ADR-0001](0001-hexagonal-ports-and-adapters.md) (ручний DI зберігається) і
   [ADR-0002](0002-in-memory-storage-with-csv-export.md) (API читає те саме in-memory сховище)
-- **Зачеплені документи:** [SDD §3, §4.4, §6.2](../../sdd.md), [ISD §1, §3, D1, §5](../../isd.md#d1), [README](../../README.md)
+- **Зачеплені документи:** [SDD §3, §4.4, §6.2](../../sdd.md), [ISD §1, §3, D1, §5](../../isd.md#d1), [README](../../../README.md)
 
 ## Контекст
 

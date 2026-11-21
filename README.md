@@ -71,7 +71,8 @@ Windows (PowerShell): ті самі скрипти з розширенням `.p
 | [docs/isd.md](docs/isd.md) | продукт · експлуатаційна | DevOps | Yehor Ishchuk |
 | [docs/architecture/adr/](docs/architecture/adr/) | продукт · архітектурна | розробники, архітектор | Yehor Ishchuk |
 | [docs/maintenance.md](docs/maintenance.md) | процес · регламент | уся команда | Yehor Ishchuk |
-| [docs/LAB1_REPORT.md](docs/LAB1_REPORT.md), [LAB8](docs/LAB8_REPORT.md) | процес (історичні звіти) | викладач | Yehor Ishchuk |
+| [docs/handover.md](docs/handover.md) | процес · передача знань | команда супроводу | Yehor Ishchuk |
+| [docs/LAB1_REPORT.md](docs/LAB1_REPORT.md), [LAB8](docs/LAB8_REPORT.md), [LAB10](docs/LAB10_REPORT.md) | процес (історичні звіти) | викладач | Yehor Ishchuk |
 | [docs/DEMO.md](docs/DEMO.md) | процес · **deprecated** | відтворення станів ЛР1/ЛР8 | Yehor Ishchuk |
 
 ## Стани репозиторію (git tags)
@@ -88,6 +89,8 @@ Windows (PowerShell): ті самі скрипти з розширенням `.p
 | `lab8-inheritance-baseline` | ієрархія звітів: DIT 3, NMO 6 |
 | `lab8-inheritance-fail` | каскадний злам ієрархії, не компілюється (навмисно) |
 | `lab8-inheritance-pass` | композиція замість успадкування: DIT 1, NMO 0 |
+| `lab10-decay-fail` | HTTP API додано без оновлення документів: DOC CURRENCY GATE FAIL (навмисно) |
+| `lab10-docs-pass` | README / SDD / ISD / ADR-0003 оновлено: DOC CURRENCY GATE PASS |
 
 ## Структура
 ```
