@@ -5,6 +5,7 @@ type: product / operational
 audience: DevOps, розробники
 review_cycle_days: 90
 last_reviewed: 2026-11-21
+change_log: 2026-11-21 — D1 став довгоживучим сервісом з HTTP-портом 8080 (SHOP_HTTP_PORT)
 ---
 
 # ISD — Infrastructure Specification Document: Shop Quality
@@ -23,7 +24,7 @@ MacBook Air (Apple Silicon, macOS 13), JDK 17+ для збірки та запу
 flowchart TB
     subgraph ws["💻 Робоча станція — macOS 13, arm64"]
         subgraph j17["JDK 17+ (JAVA_HOME)"]
-            d1["D1 · Shop Core App<br/>java -cp target/classes<br/>com.kira.shop.ShopApplication"]
+            d1["D1 · Shop Core App + HTTP API<br/>java -cp target/classes<br/>com.kira.shop.ShopApplication<br/>:8080 (SHOP_HTTP_PORT)"]
             d2[("D2 · JVM heap<br/>+ orders CSV export")]
             d3["D3 · Quality pipeline<br/>scripts/scan.sh → Maven 3.9"]
         end
@@ -33,15 +34,22 @@ flowchart TB
         d5["D5 · Audit tools<br/>Python 3 + javalang"]
     end
     gh[("D6 · GitHub<br/>YehorIshchuk/shop-quality<br/>код + документація + теги")]
+    cl([API-клієнт / curl])
+    cl -->|"HTTP :8080 /api/*"| d1
     d1 --- d2
     d3 -->|"HTTP :9000, SONAR_TOKEN"| d4
     d5 -->|"HTTP :9000"| d4
     ws -->|"git push (HTTPS)"| gh
 ```
 
-**Порядок підняття сервісів:** (1) D4 SonarQube — `sonar.sh start`, дочекатися статусу `UP`;
-(2) D3 — `scripts/scan.sh` (збирає D1 і відправляє аналіз у D4); (3) D1 запускається будь-коли після
-`mvn verify`, від D4 не залежить; (4) D5 — після D3 (читає метрики з D4) або автономно (`oo_metrics.py`, `doc_audit.py`).
+**Порядок підняття сервісів (змінено 2026-11-21):**
+1. D3 — `mvn -B clean verify` (збирає `target/classes`, проганяє тести; SonarQube для цього не потрібен).
+2. **D1 — запустити як довгоживучий сервіс** в окремому терміналі; переконатися, що порт `8080` (або `SHOP_HTTP_PORT`)
+   вільний; дочекатися рядка `HTTP API listening…` і перевірити `curl -s localhost:8080/api/health` → `{"status":"UP"}`.
+   **Лише після цього** запускати API-клієнтів.
+3. D4 SonarQube — `sonar.sh start`, дочекатися `UP` на `:9000`; потім `scripts/scan.sh` (аналіз) — незалежно від D1.
+4. D5 — після D3/D4 (читає метрики з D4) або автономно (`oo_metrics.py`, `doc_audit.py`).
+Зупинка: `Ctrl+C` у терміналі D1 (shutdown hook закриває HTTP-сервер), `sonar.sh stop` для D4.
 
 ## 2. Середовища
 
@@ -49,10 +57,10 @@ flowchart TB
 |---|---|---|---|---|
 | **dev** | IDE / VS Code на робочій станції | розробка, локальний запуск D1 | робоча копія | `mvn verify` зелений |
 | **test** | та сама станція: Maven + SonarQube D4 | автотести, покриття JaCoCo, SAST, OO-гейти, doc-гейт | коміт у `main` | Quality Gate `OK`, `OO GATE: PASS`, `DOC CURRENCY GATE: PASS` |
-| **production (demo)** | JVM на станції / ноутбук на захисті | демонстрація стану системи | git-тег (`lab*-pass`, `lab10-*`) з GitHub | демо-сценарій завершився з кодом 0 |
+| **production (demo)** | JVM на станції / ноутбук на захисті | демонстрація стану системи і HTTP API | git-тег (`lab*-pass`, `lab10-*`) з GitHub | демо-сценарій пройшов, `GET /api/health` → 200 |
 
 **Реліз** = анотований git-тег на `main` + `git push --tags`. **Відкат** = `git checkout <попередній тег>`
-→ `mvn -B clean verify` → запуск D1 (≈ 2 хв). Стани FAIL з ЛР8 навмисно не компілюються — на них не відкочуємось.
+→ `mvn -B clean verify` → зупинити поточний D1 (`Ctrl+C`) → запуск D1 з попереднього тегу (≈ 2 хв). Стани FAIL з ЛР8 навмисно не компілюються — на них не відкочуємось.
 
 ## 3. Змінні середовища (без значень секретів)
 
@@ -62,6 +70,7 @@ flowchart TB
 | `SONAR_HOST_URL` | ті самі скрипти, `tools/sonar_api_report.py` | `http://localhost:9000` (за замовчуванням) | ні |
 | `SONAR_JAVA_PATH` | запуск D4 `sonar.sh` | `/Library/Java/JavaVirtualMachines/temurin-21.jdk/Contents/Home/bin/java` | ні |
 | `JAVA_HOME` | Maven, D1 | JDK 17+ (на станції — 21/22) | ні |
+| `SHOP_HTTP_PORT` | `ShopApplication` → `ShopHttpApi` | порт HTTP API, за замовч. `8080`; `0` — випадковий вільний | ні |
 | `GATE_CLASSES` | `scripts/oo-gate-inheritance.sh` | список класів, за замовч. `ReportTable,SalesReport,MonthlySalesReport` | ні |
 
 ## 4. Вузли розгортання
@@ -69,9 +78,11 @@ flowchart TB
 <a id="d1"></a>
 ### D1 · Shop Core App (JVM)
 - Збірка: `mvn -B clean verify` → `target/classes`, звіт покриття `target/site/jacoco/jacoco.xml`.
-- Запуск: `java -cp target/classes com.kira.shop.ShopApplication` — **одноразовий процес**: виконує демо-сценарій,
-  друкує місячний звіт і резюме клієнта в лог (`java.util.logging`, stderr) і завершується з кодом 0.
-- Мережевих портів не відкриває, зовнішніх runtime-залежностей немає (лише JDK).
+- Запуск: `java -cp target/classes com.kira.shop.ShopApplication` — **довгоживучий процес-сервіс**: виконує демо-сценарій,
+  друкує місячний звіт і резюме клієнта в лог (`java.util.logging`, stderr), стартує HTTP API і працює до `Ctrl+C`.
+- Відкриває TCP-порт **8080** (`SHOP_HTTP_PORT`) на всіх інтерфейсах; при зайнятому порту падає на старті з
+  `Cannot bind HTTP API to port …`. Health-check: `GET /api/health`. Зовнішніх runtime-залежностей немає (лише JDK, модуль `jdk.httpserver`).
+- Тільки локальна мережа/демо: API без автентифікації, порт не публікувати назовні (SDD §7).
 
 <a id="d2"></a>
 ### D2 · Сховища даних
@@ -122,7 +133,8 @@ flowchart LR
 | Якість коду | `scripts/quality-gate-status.sh` | `projectStatus.status = OK` | блок релізу, виправлення до PASS |
 | Архітектура | `scripts/oo-gate-*.sh check` | `OO GATE: PASS` | рефакторинг до PASS |
 | Актуальність документації | `tools/doc_audit.py --gate` | `DOC CURRENCY GATE: PASS`, Behind = 0 | оновити документ у тому ж PR/коміті |
-| Робота D1 | лог JUL у stderr | рядки звіту без `SEVERE`, код виходу 0 | розбір стек-трейсу, тест на регресію |
+| Доступність D1 | `curl -s localhost:8080/api/health` | `{"status":"UP"}`, відповідь < 1 с | перевірити, що процес живий і порт не зайнятий; перезапустити D1 |
+| Робота D1 | лог JUL у stderr | рядки звіту без `SEVERE` | розбір стек-трейсу, тест на регресію |
 
 <a id="d6-backup"></a><a id="d6"></a>
 ## 6. Резервне копіювання та відновлення (RTO / RPO)
@@ -130,6 +142,6 @@ flowchart LR
 | Актив | Резервна копія | RPO (допустима втрата) | RTO (час відновлення) | Процедура відновлення |
 |---|---|---|---|---|
 | Код, документація, теги | GitHub `YehorIshchuk/shop-quality` (D6) | ≤ 1 робочий день (push щонайменше раз на день роботи) | ≤ 15 хв | `git clone` → `mvn -B clean verify` |
-| Дані замовлень/залишків (D2) | немає (in-memory за ADR-0002); ручний CSV-експорт | весь сеанс роботи процесу | ≈ 1 с (перезапуск D1, демо-дані засіваються заново) | перезапустити D1 |
+| Дані замовлень/залишків (D2) | немає (in-memory за ADR-0002); ручний CSV-експорт | весь сеанс роботи процесу (тепер процес довгоживучий — втрата при кожному перезапуску D1) | ≈ 5 с (перезапуск D1 до `GET /api/health` = 200, демо-дані засіваються заново) | `Ctrl+C` → запустити D1 → health-check |
 | Історія аналізів SonarQube | копія `data/` при зупиненому D4 (необов'язково) | усі аналізи після останньої копії | ≤ 30 хв | перевстановити ZIP → `setup-quality-gate.sh` → пересканувати теги ([DEMO.md §2](DEMO.md)) |
 | Токен `SONAR_TOKEN` | не зберігається | — | ≤ 2 хв | згенерувати новий у My Account → Security, старий — Revoke |

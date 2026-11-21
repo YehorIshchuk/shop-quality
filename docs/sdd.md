@@ -5,6 +5,7 @@ type: product / architectural
 audience: розробники, QA
 review_cycle_days: 180
 last_reviewed: 2026-11-21
+change_log: 2026-11-21 — додано HTTP API (api/ShopHttpApi), ADR-0003
 ---
 
 # SDD — System Design Document: Shop Quality
@@ -15,7 +16,8 @@ last_reviewed: 2026-11-21
 ## 1. Призначення та межі системи
 
 **Shop Quality** — ядро інтернет-магазину (Java 17): каталог товарів, складські залишки, оформлення,
-оплата, відвантаження і скасування замовлень, знижки за рівнем лояльності, звіти продажів, аналітика клієнта.
+оплата, відвантаження і скасування замовлень, знижки за рівнем лояльності, звіти продажів, аналітика клієнта,
+read-only HTTP API замовлень.
 Система є навчальним об'єктом контролю якості: SonarQube Quality Gate (ЛР1), OO-аудит CK/MOOD (ЛР8),
 аудит документації (ЛР10).
 
@@ -28,12 +30,14 @@ last_reviewed: 2026-11-21
 flowchart LR
     dev([👤 Розробник / оператор<br/>запускає демо, сканування, аудит]):::person
     qa([👤 QA / викладач<br/>перевіряє Quality Gate і звіти]):::person
+    client([👤 API-клієнт<br/>curl, фронтенд, інтеграції]):::person
     shop[["Shop Quality<br/>[Software System]<br/>ядро інтернет-магазину"]]:::system
     sonar[["SonarQube Server<br/>[External System]<br/>SAST + Quality Gate"]]:::ext
     pay[["Платіжний провайдер<br/>[External System, емуляція]"]]:::ext
     mail[["Пошта / SMTP<br/>[External System, емуляція]"]]:::ext
     gh[["GitHub<br/>[External System]<br/>віддалений репозиторій"]]:::ext
     dev -->|"запускає, змінює код"| shop
+    client -->|"HTTP GET /api/orders, :8080"| shop
     qa -->|"переглядає метрики"| sonar
     shop -->|"аналіз коду, Web API"| sonar
     shop -.->|"charge / refund"| pay
@@ -49,7 +53,9 @@ flowchart LR
 ```mermaid
 flowchart TB
     dev([👤 Розробник]):::person
+    client([👤 API-клієнт]):::person
     subgraph sys["Shop Quality [Software System]"]
+        api["<b>HTTP API</b><br/>[Container: JDK HttpServer, :8080]<br/>ShopHttpApi — read-only JSON"]:::container
         app["<b>Shop Core App</b><br/>[Container: Java 17, JVM]<br/>ShopApplication — Composition Root;<br/>domain + application + report"]:::container
         mem[("<b>In-memory stores</b><br/>[Container: JVM heap]<br/>ProductRepository · InventoryStore ·<br/>FileOrderRepository · SalesLedger")]:::db
         csv[("<b>orders CSV export</b><br/>[Container: файл UTF-8]<br/>order_id;customer;status;items;total")]:::db
@@ -60,6 +66,9 @@ flowchart TB
     pay[["Payment provider<br/>(FakePaymentGateway)"]]:::ext
     mail[["Mail / SMTP<br/>(ConsoleNotificationSender)"]]:::ext
     dev -->|"java -cp target/classes"| app
+    client -->|"GET /api/health, /api/orders, /api/orders/{id}"| api
+    app -->|"створює і стартує, SHOP_HTTP_PORT"| api
+    api -->|"OrderStore.findAll / findById"| mem
     dev -->|"./scripts/scan.sh"| pipe
     dev -->|"python3 tools/..."| audit
     app -->|"ports: ProductCatalog, StockService, OrderStore"| mem
@@ -90,7 +99,8 @@ flowchart TB
 | `application/port/` | Інтерфейси-контракти між use-case і адаптерами (розд. 6) | `domain/` | [ISD D1](isd.md#d1) |
 | `infrastructure/` | Адаптери: сховища в пам'яті, платіжний шлюз, сповіщення (4.3) | реалізує `application/port/` | [ISD D1](isd.md#d1), [D2](isd.md#d2) |
 | `report/` | Табличні звіти через композицію: `ReportTable` (final), `SalesReport`, `MonthlySalesReport` | `domain/` | [ISD D1](isd.md#d1) |
-| `dto/` | `OrderDto` + `OrderMapper` — плоске представлення замовлення для CSV-експорту | `domain/`, `util/` | [ISD D1](isd.md#d1) |
+| `dto/` | `OrderDto` + `OrderMapper` — плоске представлення замовлення для CSV-експорту і HTTP API | `domain/`, `util/` | [ISD D1](isd.md#d1) |
+| `api/` | `ShopHttpApi` — read-only HTTP API замовлень (розд. 4.4, контракт — 6.2) | `application/port/` (`OrderStore`), `dto/` | [ISD D1](isd.md#d1) |
 | `util/` | `MoneyUtils` (округлення HALF_UP до 0.01), `CsvUtils` (роздільник `;`, лапки для значень з `;`, `"` або переносом рядка) | — | [ISD D1](isd.md#d1) |
 
 ### 4.2 Use-case сервіси (`application/`)
@@ -119,8 +129,17 @@ flowchart TB
 | `FakePaymentGateway` | `PaymentGateway` | емуляція провайдера: ліміт 50 000 грн на транзакцію, `TX-n` | [ISD D1](isd.md#d1) |
 | `ConsoleNotificationSender` | `Notifier` | лог `java.util.logging` + журнал `getSent()` для тестів | [ISD D1](isd.md#d1) |
 
+### 4.4 HTTP API (`api/`)
+
+| Компонент | Відповідальність | Залежить від | Розгортання |
+|---|---|---|---|
+| `ShopHttpApi` | вбудований `com.sun.net.httpserver.HttpServer` JDK; маршрути `/api/health`, `/api/orders`, `/api/orders/{id}`; серіалізація `OrderDto` у JSON; лише GET (інакше 405) | порт `OrderStore` (не знає конкретного сховища), `OrderMapper` | [ISD D1](isd.md#d1) — порт `SHOP_HTTP_PORT`, за замовч. 8080 |
+
+Вибір вбудованого сервера замість Spring Boot — [ADR-0003](architecture/adr/0003-embedded-jdk-http-server.md).
+
 **Composition Root** — `ShopApplication.main`: створює адаптери, підставляє їх у конструктори сервісів,
-виконує демо-сценарій (2 товари → замовлення GOLD-клієнта → оплата → місячний звіт) і **завершується**.
+виконує демо-сценарій (2 товари → замовлення GOLD-клієнта → оплата → місячний звіт), потім **створює `ShopHttpApi`
+над тим самим `OrderStore`, стартує його і залишається працювати** до `Ctrl+C` (shutdown hook зупиняє сервер).
 
 ## 5. Модель даних
 
@@ -160,7 +179,9 @@ erDiagram
 Формат CSV-експорту (`FileOrderRepository.exportCsv`): заголовок `order_id;customer;status;items;total`,
 роздільник `;`, суми — `BigDecimal` з 2 знаками.
 
-## 6. Контракти між компонентами (API портів)
+## 6. Контракти між компонентами
+
+### 6.1 API портів (внутрішні контракти)
 
 | Порт | Операції | Постачальник → споживач |
 |---|---|---|
@@ -174,12 +195,26 @@ erDiagram
 | `SalesStatistics` | `record(order)`, `revert(order)`, `top(limit): Map` | `SalesLedger` → `OrderPaymentService` |
 | `Notifier` | `send(email, subject, body)` | `ConsoleNotificationSender` → усі сервіси зі сповіщеннями |
 
+### 6.2 HTTP API (зовнішній контракт, `ShopHttpApi`)
+
+| Запит | Статус | Тіло відповіді (`application/json; charset=utf-8`) |
+|---|---|---|
+| `GET /api/health` | 200 | `{"status":"UP"}` |
+| `GET /api/orders` | 200 | масив `Order` (порожній — `[]`) |
+| `GET /api/orders/{id}` | 200 / 404 | `Order` / `{"error":"Order not found","orderId":"{id}"}` |
+| `POST`/`PUT`/`DELETE` `/api/orders…` | 405 | `{"error":"Method not allowed"}` |
+
+Схема `Order`: `orderId` string · `customer` string · `status` enum `NEW|PAID|SHIPPED|DELIVERED|CANCELLED` ·
+`items` int (сумарна кількість одиниць) · `total` string-десяткове з 2 знаками (щоб не втрачати точність `BigDecimal`).
+
 Поведінкові контракти для QA перевіряються тестами `src/test/java`: `OrderTest` (розрахунок суми, статуси),
-`ShopServicesTest` (use-case сценарії, відмова оплати > 50 000), `ReportTest` (рендер звітів).
+`ShopServicesTest` (use-case сценарії, відмова оплати > 50 000), `ReportTest` (рендер звітів),
+`ShopHttpApiTest` (маршрути, коди 200/404/405, JSON-поля).
 
 ## 7. Якісні атрибути та обмеження
 
 - **Підтримуваність:** CBO ≤ 8, LCOM-HS = 0, DIT ≤ 1 (контроль `scripts/oo-gate-*.sh`, ЛР8); Quality Gate
   «Shop-Quality-Gate»: 0 нових багів, 100 % hotspots reviewed, дублювання ≤ 3 %, Maintainability A.
 - **Надійність даних:** дані живуть лише в пам'яті процесу — RPO/RTO див. [ISD §6](isd.md#d6-backup).
-- **Без зовнішніх runtime-залежностей:** лише JDK; JUnit 5 — тільки для тестів.
+- **Без зовнішніх runtime-залежностей:** лише JDK (включно з модулем `jdk.httpserver`); JUnit 5 — тільки для тестів.
+- **Безпека API:** лише читання, без автентифікації — призначене для локального демо; перед відкриттям назовні потрібен новий ADR.

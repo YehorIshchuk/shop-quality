@@ -8,3 +8,4 @@
 |---|---|---|---|
 | [0001](0001-hexagonal-ports-and-adapters.md) | Порти та адаптери з ручним DI замість God Object | Accepted | 2026-11-15 |
 | [0002](0002-in-memory-storage-with-csv-export.md) | Сховище в пам'яті процесу + CSV-експорт замовлень | Accepted | 2026-11-15 |
+| [0003](0003-embedded-jdk-http-server.md) | HTTP API на вбудованому `HttpServer` JDK | Accepted | 2026-11-21 |

@@ -8,6 +8,7 @@
     "docs/isd.md",
     "docs/architecture/adr/0001-hexagonal-ports-and-adapters.md",
     "docs/architecture/adr/0002-in-memory-storage-with-csv-export.md",
+    "docs/architecture/adr/0003-embedded-jdk-http-server.md",
     "docs/maintenance.md",
     "docs/DEMO.md",
     "docs/LAB1_REPORT.md",
@@ -44,6 +45,11 @@
     {
       "name": "Reports",
       "path": "src/main/java/com/kira/shop/report",
+      "doc": "docs/sdd.md"
+    },
+    {
+      "name": "HTTP API",
+      "path": "src/main/java/com/kira/shop/api",
       "doc": "docs/sdd.md"
     },
     {

@@ -1,0 +1,17 @@
+$ SHOP_HTTP_PORT=18080 java -cp target/classes com.kira.shop.ShopApplication   # стан lab10-decay-fail
+Nov 21, 2026 2:50:53 AM com.kira.shop.infrastructure.ConsoleNotificationSender send
+INFO: kira@example.com | Order ORD-1 | Total: 31573.50 UAH
+Nov 21, 2026 2:50:53 AM com.kira.shop.infrastructure.ConsoleNotificationSender send
+INFO: kira@example.com | Payment received | TX-1001
+Nov 21, 2026 2:50:53 AM com.kira.shop.ShopApplication main
+INFO: *** MONTHLY SALES 2026-11 ***
+2026-11 - ORD-1 | Kira | 31573.50 UAH
+Orders: 1, revenue: 31573.50 UAH, avg: 31573.50 UAH
+Nov 21, 2026 2:50:53 AM com.kira.shop.ShopApplication main
+INFO: Premium purchase: Laptop
+Customer: Kira
+Paid orders: 1, cancelled: 0
+Spent: 31573.50 UAH
+Recommendation: keep GOLD
+Nov 21, 2026 2:50:53 AM com.kira.shop.ShopApplication main
+INFO: HTTP API listening on http://localhost:18080/api/orders (Ctrl+C to stop)

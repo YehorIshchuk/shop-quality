@@ -2,7 +2,8 @@
 
 **Що це і для кого.** Ядро інтернет-магазину на Java 17: каталог і склад, оформлення, оплата, відвантаження
 та скасування замовлень, знижки для постійних клієнтів (SILVER / GOLD / PLATINUM), безкоштовна доставка від 2000 грн,
-місячні звіти продажів і аналітика клієнта. Платіжний провайдер і пошта емулюються, дані живуть у пам'яті.
+місячні звіти продажів і аналітика клієнта, **HTTP API замовлень** (`/api/orders`). Платіжний провайдер і пошта
+емулюються, дані живуть у пам'яті.
 
 Проєкт — навчальний об'єкт інженерії якості: **ЛР1** (SonarQube, Quality Gate), **ЛР8** (CK / MOOD,
 God Object, Inheritance Hell), **ЛР10** (аудит і супровід документації, архітектурний паспорт).
@@ -13,13 +14,27 @@ God Object, Inheritance Hell), **ЛР10** (аудит і супровід док
 
 ```bash
 git clone https://github.com/YehorIshchuk/shop-quality.git && cd shop-quality
-mvn -B clean verify                                    # збірка + 22 тести + покриття JaCoCo
-java -cp target/classes com.kira.shop.ShopApplication  # демо-сценарій
+mvn -B clean verify                                    # збірка + 23 тести + покриття JaCoCo
+java -cp target/classes com.kira.shop.ShopApplication  # демо-сценарій + HTTP API на :8080
 ```
 
 Очікуваний результат: у лог виводиться лист про замовлення `ORD-1` на 31573.50 UAH (GOLD-клієнт, знижка),
-підтвердження оплати `TX-…`, місячний звіт `*** MONTHLY SALES … ***` і резюме клієнта `Recommendation: keep GOLD`.
-Програма завершується сама з кодом 0.
+підтвердження оплати `TX-…`, місячний звіт `*** MONTHLY SALES … ***`, резюме клієнта `Recommendation: keep GOLD`
+і рядок `HTTP API listening on http://localhost:8080/api/orders`. **Програма продовжує працювати як сервіс** —
+зупинка `Ctrl+C`. Інший порт: `SHOP_HTTP_PORT=9090 java -cp target/classes com.kira.shop.ShopApplication`.
+
+### HTTP API (read-only)
+
+| Метод і маршрут | Відповідь |
+|---|---|
+| `GET /api/health` | `200 {"status":"UP"}` |
+| `GET /api/orders` | `200 [{"orderId":"ORD-1","customer":"Kira","status":"PAID","items":4,"total":"31573.50"}]` |
+| `GET /api/orders/{id}` | `200` одне замовлення · `404 {"error":"Order not found","orderId":"…"}` |
+| інші методи на `/api/orders` | `405 {"error":"Method not allowed"}` |
+
+```bash
+curl -s localhost:8080/api/orders/ORD-1
+```
 
 ## Онбординг нового розробника
 

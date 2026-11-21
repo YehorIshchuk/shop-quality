@@ -30,7 +30,11 @@ last_reviewed: 2026-11-21
 | [isd.md](isd.md) | експлуатаційна | Yehor Ishchuk | 90 днів | 2026-11-21 | 2027-02-19 | `ShopApplication.java` (режим запуску), `pom.xml`, `scripts/`, `tools/`, нові змінні середовища / порти |
 | [ADR-0001](architecture/adr/0001-hexagonal-ports-and-adapters.md) | архітектурна | Yehor Ishchuk | 180 днів | 2026-11-21 | 2027-05-20 | зміна шарів / способу DI → **новий ADR**, старий `Superseded` |
 | [ADR-0002](architecture/adr/0002-in-memory-storage-with-csv-export.md) | архітектурна | Yehor Ishchuk | 180 днів | 2026-11-21 | 2027-05-20 | зміна сховища → **новий ADR**, старий `Superseded` |
+| [ADR-0003](architecture/adr/0003-embedded-jdk-http-server.md) | архітектурна | Yehor Ishchuk | 180 днів | 2026-11-21 | 2027-05-20 | зміна веб-стеку / відкриття API назовні → **новий ADR** |
 | [maintenance.md](maintenance.md) | процес | Yehor Ishchuk | 90 днів | 2026-11-21 | 2027-02-19 | новий документ у паспорті, зміна власника |
+
+**Журнал позапланових переглядів:** 2026-11-21 — README, SDD, ISD, ADR-0003 оновлено після додавання HTTP API
+(коміт `docs(maintenance): restore documentation currency, PASS`; FAIL-стан — тег `lab10-decay-fail`).
 
 Документи процесу (`LAB*_REPORT.md`, `docs/lab8/*.log`, `reports/**`, повідомлення комітів) — історичні записи,
 **не переглядаються і не переписуються**. `DEMO.md` і `lab8/architecture-blueprint.md` — `deprecated`.

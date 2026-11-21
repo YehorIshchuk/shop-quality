@@ -10,7 +10,7 @@
   * Behind            — git rev-list --count <останній коміт документа>..HEAD -- <шлях>
                         (скільки комітів коду пройшло після останнього оновлення документа)
 Структурні перевірки (structure drift) — порівняння коду з текстом документів:
-  * кожен пакет і кожен клас адаптерів (infrastructure/, api/) згадано в SDD;
+  * кожен пакет (як `назва/` у бектиках) і кожен клас адаптерів (infrastructure/, api/) згадано в SDD;
   * кожен HTTP-маршрут (createContext("...")) згадано в SDD і README;
   * кожна змінна середовища (System.getenv / ${VAR} у scripts/*.sh) згадана в ISD.
 
@@ -105,7 +105,7 @@ def structure_checks(cfg: dict) -> list[tuple[str, str, bool]]:
     pkg_root = src.joinpath(*base)
     for pkg in sorted({p.parent for p in java if p.parent != pkg_root}):
         name = pkg.relative_to(pkg_root).as_posix()
-        checks.append((f"пакет `{name}/` описано в SDD", sdd_path, f"{name}/" in sdd))
+        checks.append((f"пакет `{name}/` описано в SDD", sdd_path, f"`{name}/`" in sdd))
     for f in java:
         rel = f.relative_to(pkg_root).as_posix()
         if rel.startswith(("infrastructure/", "api/")):
