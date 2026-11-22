@@ -5,6 +5,10 @@
 
 ## [Unreleased]
 
+### Змінено
+
+- `PaymentResult` — Java 17 `record` замість класу з ручними полями (менше шаблонного коду, API порту без змін).
+
 ## [v1.1.0] — 2026-11-22
 
 Перший реліз за RFC-процесом ([RFC-001](docs/changes/RFC-001.md), Release Checklist — `docs/changes/release-checklist.md`).
