@@ -1,0 +1,215 @@
+openapi: 3.0.3
+info:
+  title: Shop Quality Orders API
+  version: 1.0.0
+  description: |
+    Read-only HTTP API замовлень ядра інтернет-магазину Shop Quality.
+    Реалізація — `com.kira.shop.api.ShopHttpApi` (вбудований `HttpServer` JDK, ADR-0003).
+    Дані живуть у пам'яті процесу (ADR-0002): після перезапуску в системі одне демо-замовлення `ORD-1`.
+
+    Контракт — єдине джерело істини (Single Source of Truth): з нього рендериться довідка Swagger UI
+    у базі знань, генерується клієнтський SDK, а Schemathesis перевіряє живий API на відповідність.
+  contact:
+    name: Yehor Ishchuk
+    url: https://github.com/YehorIshchuk/shop-quality
+  license:
+    name: Educational use (KPI labs)
+servers:
+  - url: http://localhost:8080
+    description: Локальний запуск (порт за замовчуванням, змінна SHOP_HTTP_PORT)
+tags:
+  - name: system
+    description: Технічний стан сервісу
+  - name: orders
+    description: Перегляд замовлень
+paths:
+  /api/health:
+    get:
+      tags: [system]
+      operationId: getHealth
+      summary: Перевірка доступності
+      description: >-
+        Health-check для моніторингу і порядку запуску сервісів (ISD §1, §5).
+        Повертає `UP`, якщо HTTP API прийняв з'єднання.
+      responses:
+        '200':
+          description: Сервіс працює
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Health'
+              example:
+                status: UP
+        '405':
+          $ref: '#/components/responses/MethodNotAllowed'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/orders:
+    get:
+      tags: [orders]
+      operationId: listOrders
+      summary: Список замовлень
+      description: >-
+        Повертає всі замовлення зі сховища `OrderStore` у порядку створення.
+        Порожнє сховище — порожній масив `[]`.
+      responses:
+        '200':
+          description: Масив замовлень
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderList'
+              example:
+                - orderId: ORD-1
+                  customer: Kira
+                  status: PAID
+                  items: 4
+                  total: '31573.50'
+        '405':
+          $ref: '#/components/responses/MethodNotAllowed'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/orders/{orderId}:
+    get:
+      tags: [orders]
+      operationId: getOrderById
+      summary: Замовлення за ідентифікатором
+      description: >-
+        Повертає одне замовлення. Невідомий ідентифікатор — `404` зі спільним об'єктом `Error`,
+        у якому поле `orderId` повторює запитаний ідентифікатор.
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          description: Ідентифікатор замовлення у форматі `ORD-<n>`
+          schema:
+            type: string
+            minLength: 1
+            example: ORD-1
+      responses:
+        '200':
+          description: Знайдене замовлення
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+              example:
+                orderId: ORD-1
+                customer: Kira
+                status: PAID
+                items: 4
+                total: '31573.50'
+        '404':
+          description: Замовлення не знайдено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error: Order not found
+                orderId: ORD-9
+        '405':
+          $ref: '#/components/responses/MethodNotAllowed'
+        '500':
+          $ref: '#/components/responses/InternalError'
+components:
+  schemas:
+    Health:
+      type: object
+      description: Стан сервісу
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [UP]
+          description: Стан HTTP API
+      additionalProperties: false
+      example:
+        status: UP
+    Order:
+      type: object
+      description: Плоске представлення замовлення (`OrderDto`)
+      required: [orderId, customer, status, items, total]
+      properties:
+        orderId:
+          type: string
+          description: Ідентифікатор замовлення
+          example: ORD-1
+        customer:
+          type: string
+          description: Ім'я клієнта
+          example: Kira
+        status:
+          type: string
+          description: Стан життєвого циклу (SDD §5)
+          enum: [NEW, PAID, SHIPPED, DELIVERED, CANCELLED]
+          example: PAID
+        items:
+          type: integer
+          format: int32
+          minimum: 0
+          description: Сумарна кількість одиниць товару в замовленні
+          example: 4
+        total:
+          type: string
+          pattern: '^-?\d+\.\d{2}$'
+          description: Сума до сплати, UAH — рядок, щоб не втрачати точність `BigDecimal`
+          example: '31573.50'
+      additionalProperties: false
+      example:
+        orderId: ORD-1
+        customer: Kira
+        status: PAID
+        items: 4
+        total: '31573.50'
+    OrderList:
+      type: array
+      description: Список замовлень
+      items:
+        $ref: '#/components/schemas/Order'
+      example:
+        - orderId: ORD-1
+          customer: Kira
+          status: PAID
+          items: 4
+          total: '31573.50'
+    Error:
+      type: object
+      description: Спільний об'єкт помилки для всіх маршрутів і всіх кодів 4xx / 5xx
+      required: [error]
+      properties:
+        error:
+          type: string
+          description: Людиночитний опис помилки
+          example: Order not found
+        orderId:
+          type: string
+          description: Запитаний ідентифікатор (лише для 404 на `/api/orders/{orderId}`)
+          example: ORD-9
+      additionalProperties: false
+      example:
+        error: Order not found
+        orderId: ORD-9
+  responses:
+    MethodNotAllowed:
+      description: Метод не підтримується — API лише для читання
+      headers:
+        Allow:
+          description: Дозволені методи
+          schema:
+            type: string
+            example: GET
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: Method not allowed
+    InternalError:
+      description: Неочікувана помилка сервера
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: Internal server error

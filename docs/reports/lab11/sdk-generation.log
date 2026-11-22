@@ -1,0 +1,51 @@
+$ openapi-generator-cli generate -i docs/api/openapi.yaml -g java --library native -o sdk-client \
+    --additional-properties=groupId=com.kira.shop,artifactId=shop-orders-client,artifactVersion=1.0.0,invokerPackage=com.kira.shop.client,apiPackage=com.kira.shop.client.api,modelPackage=com.kira.shop.client.model,hideGenerationTimestamp=true
+# OpenAPI Generator 7.27.0
+sdk-client/src/main/java/com/kira/shop/client/model/Error.java
+sdk-client/src/test/java/com/kira/shop/client/model/ErrorTest.java
+sdk-client/docs/Error.md
+sdk-client/src/main/java/com/kira/shop/client/model/Health.java
+sdk-client/src/test/java/com/kira/shop/client/model/HealthTest.java
+sdk-client/docs/Health.md
+sdk-client/src/main/java/com/kira/shop/client/model/Order.java
+sdk-client/src/test/java/com/kira/shop/client/model/OrderTest.java
+sdk-client/docs/Order.md
+sdk-client/src/main/java/com/kira/shop/client/api/OrdersApi.java
+sdk-client/src/test/java/com/kira/shop/client/api/OrdersApiTest.java
+sdk-client/docs/OrdersApi.md
+sdk-client/src/main/java/com/kira/shop/client/api/SystemApi.java
+sdk-client/src/test/java/com/kira/shop/client/api/SystemApiTest.java
+sdk-client/docs/SystemApi.md
+sdk-client/pom.xml
+sdk-client/README.md
+sdk-client/build.gradle
+sdk-client/build.sbt
+sdk-client/settings.gradle
+sdk-client/gradle.properties
+sdk-client/src/main/AndroidManifest.xml
+sdk-client/.travis.yml
+sdk-client/src/main/java/com/kira/shop/client/ApiClient.java
+sdk-client/src/main/java/com/kira/shop/client/ServerConfiguration.java
+sdk-client/src/main/java/com/kira/shop/client/ServerVariable.java
+sdk-client/.github/workflows/maven.yml
+sdk-client/api/openapi.yaml
+sdk-client/gradlew
+sdk-client/gradlew.bat
+sdk-client/gradle/wrapper/gradle-wrapper.properties
+sdk-client/gradle/wrapper/gradle-wrapper.jar
+sdk-client/git_push.sh
+sdk-client/.gitignore
+sdk-client/src/main/java/com/kira/shop/client/ApiException.java
+sdk-client/src/main/java/com/kira/shop/client/Configuration.java
+sdk-client/src/main/java/com/kira/shop/client/Pair.java
+sdk-client/src/main/java/com/kira/shop/client/ApiResponse.java
+sdk-client/src/main/java/com/kira/shop/client/JSON.java
+sdk-client/src/main/java/com/kira/shop/client/model/AbstractOpenApiSchema.java
+sdk-client/src/main/java/com/kira/shop/client/RFC3339DateFormat.java
+sdk-client/src/main/java/com/kira/shop/client/RFC3339InstantDeserializer.java
+sdk-client/src/main/java/com/kira/shop/client/RFC3339JavaTimeModule.java
+sdk-client/.openapi-generator-ignore
+sdk-client/.openapi-generator/VERSION
+sdk-client/.openapi-generator/FILES
+
+# згенеровано файлів: 46

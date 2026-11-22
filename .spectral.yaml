@@ -1,0 +1,51 @@
+# Spectral — правила якості контракту docs/api/openapi.yaml (ЛР11, Завдання 2).
+# Запуск: npx @stoplight/spectral-cli lint docs/api/openapi.yaml --fail-severity=error   (поріг: 0 errors)
+extends: [["spectral:oas", recommended]]
+
+rules:
+  # --- вимоги методички, піднято до error ---
+  operation-description: error          # кожна операція має непорожній description
+  operation-operationId: error          # operationId потрібен для імен методів SDK
+  operation-tags: error
+
+  schema-has-example:
+    description: Кожна схема в components.schemas має хоча б один example
+    message: "Схема не має example ({{path}})"
+    severity: error
+    given: "$.components.schemas[*]"
+    then:
+      field: example
+      function: truthy
+
+  operation-defines-500:
+    description: Кожна операція документує 500 (узгоджена обробка серверних помилок)
+    message: "Операція не описує відповідь 500"
+    severity: error
+    given: "$.paths[*][get,put,post,delete,patch]"
+    then:
+      field: "responses.500"
+      function: truthy
+
+  error-responses-use-error-schema:
+    description: "Усі відповіді 4xx/5xx використовують спільну схему #/components/schemas/Error"
+    message: "Відповідь з помилкою не посилається на спільну схему Error ({{path}})"
+    severity: error
+    resolved: false
+    given:
+      - "$.paths[*][*].responses[?(@property.match(/^[45]/) && @.content)].content.application/json.schema"
+      - "$.components.responses[*].content.application/json.schema"
+    then:
+      field: "$ref"
+      function: pattern
+      functionOptions:
+        match: "^#/components/schemas/Error$"
+
+  error-responses-have-example:
+    description: Кожна відповідь з помилкою має приклад тіла
+    severity: error
+    given:
+      - "$.paths[*][*].responses[?(@property.match(/^[45]/) && @.content)].content.application/json"
+      - "$.components.responses[*].content.application/json"
+    then:
+      field: example
+      function: truthy
