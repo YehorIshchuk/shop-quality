@@ -4,7 +4,7 @@
 # Використання:  ./scripts/restore-drill.sh <шлях до shop-quality-full-*.bundle.enc>
 # Змінні: BACKUP_PASSPHRASE (ключ), SHOP_HTTP_PORT (порт перевірки, за замовч. 18080),
 #         BUILD_CMD (збірка + тести, за замовч. "mvn -B -q verify"),
-#         MKDOCS_CMD (збірка бази знань у чистому venv, за замовч. "mkdocs build --strict -q")
+#         MKDOCS_CMD (збірка бази знань у чистому venv, за замовч. "mkdocs build --strict", БЕЗ -q)
 # Drill #1 (2026-11-22) показав: відновлення не може покладатися на інструменти старої машини —
 # тому крок 6 створює чисте venv і ставить залежності з requirements-docs.txt.
 set -euo pipefail
@@ -12,7 +12,7 @@ ENC="${1:?шлях до .bundle.enc}"
 : "${BACKUP_PASSPHRASE:?задайте BACKUP_PASSPHRASE}"
 PORT="${SHOP_HTTP_PORT:-18080}"
 BUILD_CMD="${BUILD_CMD:-mvn -B -q verify}"
-MKDOCS_CMD="${MKDOCS_CMD:-mkdocs build --strict -q}"
+MKDOCS_CMD="${MKDOCS_CMD:-mkdocs build --strict}"   # без -q: з -q warnings не рахуються і strict дає хибний PASS (ЛР11)
 WORK="$(mktemp -d)"
 T0=$(date +%s)
 step() { printf '%s  +%4ss  %s\n' "$(date -u +%H:%M:%SZ)" "$(( $(date +%s) - T0 ))" "$*"; }

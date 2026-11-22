@@ -1,0 +1,15 @@
+$ ./scripts/restore-drill.sh /tmp/shop-backup3/shop-quality-full-20261122T192218Z.bundle.enc   # drill #3: перевірка після виправлення MKDOCS_CMD (без -q), BUILD_CMD=javac (sandbox)
+19:22:19Z  +   0s  1. перевірка цілісності: sha256
+/tmp/shop-backup3/shop-quality-full-20261122T192218Z.bundle.enc: OK
+19:22:19Z  +   0s  2. розшифрування AES-256
+19:22:19Z  +   0s  3. git bundle verify
+/tmp/tmp.TzYZjscJAr/restore.bundle is okay
+19:22:19Z  +   0s  4. клонування в чистий каталог
+19:22:20Z  +   1s     HEAD 1beae41 docs(maintenance): deliver capa actions and swebok plan, PASS  ·  тегів: 20
+19:22:20Z  +   1s  5. збірка і тести: mkdir -p target/classes && javac -encoding UTF-8 -d target/classes $(find src/main/java -name "*.java") && bash /home/claude/verify.sh . | tail -1
+Tests passed: 25, failed: 0
+19:22:25Z  +   6s  6. база знань: чисте venv + requirements-docs.txt + python /tmp/mk_online_drill.py 2>&1 | grep -E "^WARNING|Aborted|built in"
+INFO    -  Documentation built in 3.61 seconds
+19:22:38Z  +  19s  7. запуск API на :18080 і health-перевірка
+19:22:39Z  +  20s  RESTORE DRILL: PASS — фактичний RTO 20 с (ціль ISD: ≤ 900 с)
+exit=0

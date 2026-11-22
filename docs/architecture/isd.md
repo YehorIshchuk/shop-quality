@@ -77,7 +77,7 @@ flowchart TB
 | `SHOP_HTTP_PORT` | `ShopApplication` → `ShopHttpApi` | порт HTTP API, за замовч. `8080`; `0` — випадковий вільний | ні |
 | `DEPLOY_DIR` | `scripts/deploy-api.sh` (RB-001) | каталог релізів і PID, за замовч. `~/shop-deploy` | ні |
 | `BUILD_CMD` | `scripts/deploy-api.sh`, `scripts/restore-drill.sh` | команда збірки, за замовч. `mvn -B -q -DskipTests package` / `mvn -B -q verify` | ні |
-| `MKDOCS_CMD` | `scripts/restore-drill.sh` | збірка бази знань у drill, за замовч. `mkdocs build --strict -q` | ні |
+| `MKDOCS_CMD` | `scripts/restore-drill.sh` | збірка бази знань у drill, за замовч. `mkdocs build --strict` (без `-q`: він приховує warnings і strict хибно проходить) | ні |
 | `BACKUP_DIR` | `scripts/backup.sh` | носій №2 для копій, напр. `/Volumes/ShopBackup` | ні |
 | `BACKUP_PASSPHRASE` | `scripts/backup.sh`, `scripts/restore-drill.sh` | ключ шифрування AES-256 — лише з Keychain / менеджера паролів | **так** |
 | `GATE_CLASSES` | `scripts/oo-gate-inheritance.sh` | список класів, за замовч. `ReportTable,SalesReport,MonthlySalesReport` | ні |
@@ -211,9 +211,11 @@ export BACKUP_PASSPHRASE='…'          # з Keychain
 |---|---|---|---|
 | #1 | 2026-11-22 18:48 | ❌ FAIL на кроці 6: `No module named 'mermaid2'` | відновлення неявно залежало від інструментів старої машини (системний `mkdocs` без плагінів) → крок 6 переписано на чисте venv |
 | #2 | 2026-11-22 18:49 | ✅ PASS, RTO **20 с** | код, 16 тегів, 25 тестів, strict-збірка бази знань, API health — відновлено |
+| #3 | 2026-11-22 19:22 | ✅ PASS, RTO **20 с** | повтор після виправлення кроку 6: за замовчуванням `mkdocs build --strict` **без `-q`** (з `-q` strict-збірка з мертвим посиланням повертала 0 — хибний PASS); копія містить ЛР12 (теги `v1.1.0`, `lab12-*`) |
 
 Логи: [drill #1](https://github.com/YehorIshchuk/shop-quality/blob/main/docs/reports/lab12/restore-drill-1-fail.log) ·
-[drill #2](https://github.com/YehorIshchuk/shop-quality/blob/main/docs/reports/lab12/restore-drill-2-pass.log).
+[drill #2](https://github.com/YehorIshchuk/shop-quality/blob/main/docs/reports/lab12/restore-drill-2-pass.log) ·
+[drill #3](https://github.com/YehorIshchuk/shop-quality/blob/main/docs/reports/lab12/restore-drill-3-pass.log).
 
 ## 7. Експлуатаційні процедури
 

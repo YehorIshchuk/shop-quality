@@ -24,7 +24,8 @@ tags: [process, ops]
 | `60f7c45` | `docs(legacy): reverse-engineer tools/oo_metrics.py …` | 3.1 |
 | `f966559` | `refactor(port): make PaymentResult a Java 17 record` | 3.2 — тригер інциденту |
 | `821c18f` (тег `lab12-incident-fail`) | `ops(incident): capture legacy module outage, FAIL` | 3.2 |
-| наступний (тег `lab12-capa-pass`) | `docs(maintenance): deliver capa actions and swebok plan, PASS` | 3.3–3.5 |
+| `1beae41` (тег `lab12-capa-pass`) | `docs(maintenance): deliver capa actions and swebok plan, PASS` | 3.3–3.5 |
+| наступний | `fix(ops): restore drill strict build without -q, drill #3 PASS` | 1 (знахідка валідації) |
 
 ---
 
@@ -82,7 +83,7 @@ clone 1 + `mvn verify` 3 + strict-збірка 3 + health 1), RPO ≤ 24 год;
 CHANGELOG.
 
 **Restore drill:** #1 — ❌ FAIL (`No module named mermaid2`: відновлення неявно залежало від системного mkdocs) →
-крок переписано на чисте venv; #2 — ✅ PASS, RTO 20 с.
+крок переписано на чисте venv; #2 — ✅ PASS, RTO 20 с; #3 — ✅ PASS після виправлення `--strict -q` → `--strict` (див. лог ШІ, п. 15).
 
 > 📸 **Скріншот 2** — `restore-drill.sh`: рядок `RESTORE DRILL: PASS` і RTO.
 
@@ -179,9 +180,10 @@ SLO і SLA не порушено.
 | 11 | Лог PASS-конвеєра коректний | перегляд логу | ❌ невірний аргумент `--base` у `sli_probe` і код виходу від `tail` замість гейта → рядки переміряно |
 | 12 | Бюджет 8 хв = 0.4 % | `slo_budget.py --consumed pipeline-verdict=8` | ✅ |
 | 13 | Часи тріажу 19:11–19:15 в INC-001 | — | ⚠️ це хвилини симуляції (ручні кроки), не машинні мітки; машинні — з логів |
+| 15 | `restore-drill.sh` за замовчуванням збирає базу знань `mkdocs build --strict -q` | мутаційна перевірка: мертве посилання + `--strict -q` | ❌ **exit 0 — хибний PASS** (та сама пастка, що в ЛР11 п. 8) → без `-q`, drill #3 PASS |
 | 14 | Конвеєр на GitHub: зелений → червоний → зелений | Actions після push (скріншоти 3–5) | заповнює студент |
 
-**Висновок.** Вісім тверджень ШІ (1–7, 9, 11) без перевірки дали б хибні документи. Найважливіше для ЛР12 — п. 7:
+**Висновок.** Дев'ять тверджень ШІ (1–7, 9, 11, 15) без перевірки дали б хибні документи. Найважливіше для ЛР12 — п. 7:
 ШІ ледь не зробив інцидент «брудним» (червоним із двох причин), що зруйнувало б RCA.
 
 ## Пов'язані документи
