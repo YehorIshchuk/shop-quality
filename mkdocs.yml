@@ -65,6 +65,7 @@ nav:
       - reports/LAB1_REPORT.md
       - reports/LAB8_REPORT.md
       - reports/LAB10_REPORT.md
+      - reports/LAB11_REPORT.md
       - reports/DEMO.md
   - "Теги": tags.md
 
@@ -81,7 +82,7 @@ plugins:
   - search:
       lang: [ru, en]               # lunr не має українського стемера; ru дає найближчу морфологію
   - tags                           # front matter tags → сторінка «Теги» (ті самі теги бачить Obsidian)
-  - roamlinks                      # [[wikilinks]] з Obsidian → звичайні посилання на сайті
+  - roamlinks                      # wikilinks з Obsidian → звичайні посилання на сайті
   - include-markdown               # docs/index.md і changelog.md рендеряться з README.md / CHANGELOG.md (SSOT)
   - mermaid2                       # C4- і ER-діаграми з ЛР10
   - swagger-ui-tag                 # <swagger-ui src="openapi.yaml"/> — довідка API з контракту (SSOT)

@@ -58,7 +58,7 @@ python3 tools/doc_audit.py --gate          # актуальність докум
 ## 5. Obsidian як редактор бази знань
 
 Відкрити **корінь репозиторію** як Vault (*Open folder as vault*). Зв'язки між документами — wikilinks
-(`[[sdd]]`, `[[isd]]`), теги — поле `tags` у front matter (`#architecture`, `#api`, `#ops`, `#developer`).
+(ім'я файлу в подвійних квадратних дужках, див. блоки «Пов'язані документи»), теги — поле `tags` у front matter (`#architecture`, `#api`, `#ops`, `#developer`).
 Папка `.obsidian/` у `.gitignore`. Граф знань: *Open graph view* (Cmd+G).
 
 ## Пов'язані документи

@@ -1,0 +1,27 @@
+
+
+
+INFO    -  DeprecationWarning: warning_filter doesn't do anything since MkDocs 1.2 and will be removed soon. All messages on the `mkdocs` logger get counted automatically.
+  File "/home/claude/dvenv/lib/python3.13/site-packages/mkdocs_roamlinks_plugin/plugin.py", line 10, in <module>
+    log.addFilter(mkdocs.utils.warning_filter)
+  File "/home/claude/dvenv/lib/python3.13/site-packages/mkdocs/utils/__init__.py", line 403, in __getattr__
+    warnings.warn(
+
+INFO    -  MERMAID2  - Initialization arguments: {}
+INFO    -  MERMAID2  - Using javascript library (10.4.0):
+   https://unpkg.com/mermaid@10.4.0/dist/mermaid.esm.min.mjs
+INFO    -  Cleaning site directory
+INFO    -  Building documentation to directory: /tmp/site-ci
+INFO    -  mkdocs_swagger_ui_tag: Processing file 'api/index.md'
+INFO    -  MERMAID2  - Found superfences config: {'custom_fences': [{'name': 'mermaid', 'class': 'mermaid', 'format': functools.partial(<function fence_mermaid at 0x7fcb48669a80>, custom=True)}]}
+INFO    -  MERMAID2  - Found 'fence_mermaid_custom' function: activate custom loader for superfences
+INFO    -  MERMAID2  - Custom loader activated
+INFO    -  MERMAID2  - Page 'Blueprint ЛР8 (deprecated)': found 2 diagrams, adding scripts
+INFO    -  MERMAID2  - Custom loader activated
+INFO    -  MERMAID2  - Page 'ISD — Infrastructure Specification': found 2 diagrams, adding scripts
+INFO    -  MERMAID2  - Custom loader activated
+INFO    -  MERMAID2  - Page 'SDD — System Design Document': found 3 diagrams, adding scripts
+INFO    -  MERMAID2  - Custom loader activated
+INFO    -  MERMAID2  - Page 'Звіт ЛР10': found 1 diagrams, adding scripts
+INFO    -  mkdocs_swagger_ui_tag: Copying swagger ui assets.
+INFO    -  Documentation built in 1.84 seconds

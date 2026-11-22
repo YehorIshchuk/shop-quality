@@ -10,3 +10,5 @@ review_date: 2027-02-19
 Ті самі теги, що в графі Obsidian (`#architecture`, `#api`, `#ops`, `#developer`, `#process`).
 
 <!-- material/tags -->
+
+Рівні бази знань: [[developer/index|Розробникам]] · [[api/index|API]] · [[architecture/index|Архітектура]] · [[sdd]] · [[isd]].

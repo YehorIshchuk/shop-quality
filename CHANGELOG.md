@@ -5,6 +5,8 @@
 
 ## [Unreleased]
 
+## [docs-v2.0] — 2026-11-22
+
 ### Додано
 
 - База знань MkDocs Material за пірамідою README → Developer → API → Architecture (ЛР11).
