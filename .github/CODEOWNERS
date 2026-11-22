@@ -1,0 +1,10 @@
+# Власники документації (регламент docs/developer/maintenance.md).
+# Разом із правилом гілки main «Require review from Code Owners» зміна цих шляхів
+# фізично не зливається без схвалення власника.
+
+/docs/                      @YehorIshchuk
+/README.md                  @YehorIshchuk
+/CHANGELOG.md               @YehorIshchuk
+/mkdocs.yml                 @YehorIshchuk
+/requirements-docs.txt      @YehorIshchuk
+/.github/                   @YehorIshchuk

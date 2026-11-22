@@ -1,11 +1,19 @@
+---
+title: Звіт ЛР10
+owner: Yehor Ishchuk
+status: published
+review_date: 2027-11-22
+tags: [process]
+---
+
 # Звіт ЛР10. Інженерний аудит документації, архітектурний паспорт (SDD, ISD, ADR) і Handover
 
 - **Студент:** Yehor Ishchuk
-- **Об'єкт:** `shop-quality`, ядро інтернет-магазину (Java 17), розвивається з ЛР1. Репозиторій: https://github.com/YehorIshchuk/shop-quality
+- **Об'єкт:** `shop-quality`, ядро інтернет-магазину (Java 17), розвивається з ЛР1. Репозиторій: <https://github.com/YehorIshchuk/shop-quality>
 - **Інструменти:** Git CLI, Markdown (Obsidian / VS Code), Mermaid, `tools/doc_audit.py` (обгортка над Git CLI, друкує кожну команду і її вивід)
 - **Дата:** 2026-11-21
 
-**Коміти ЛР10**
+**Коміти ЛР10:**
 
 | Коміт | Повідомлення | Завдання |
 |---|---|---|
@@ -51,7 +59,7 @@
 ### 1.2 Лог метрик актуальності (Git CLI)
 
 Скрипт `tools/doc_audit.py` виконує команди з методички і друкує їх разом із виводом. Повний лог:
-[reports/docs/01-baseline.md](../reports/docs/01-baseline.md). Фрагмент:
+[reports/docs/01-baseline.md](https://github.com/YehorIshchuk/shop-quality/blob/main/reports/docs/01-baseline.md). Фрагмент:
 
 ```text
 $ git log -1 --format=%cs -- README.md
@@ -111,6 +119,7 @@ $ git rev-list --count 0cee12c..HEAD -- scripts
 ### 1.3 Діагноз антипатернів
 
 **Documentation Decay** (документ описує систему, якої вже немає):
+
 1. `README.md` → «Швидкий старт» починається з `docker compose up -d`, хоча фактичне робоче середовище — SonarQube 26.x
    з ZIP на JDK 21 через `SONAR_JAVA_PATH`. Новачок, який іде за README, зупиняється на першому кроці.
 2. `docs/DEMO.md` → у §0 Docker Desktop указаний як обов'язковий, у §1 описано вхід `admin / admin` через контейнер.
@@ -119,6 +128,7 @@ $ git rev-list --count 0cee12c..HEAD -- scripts
 5. `scripts` → на 1 коміт новіші за README (PowerShell-гейти не відображені в документації).
 
 **Dead Documentation** (документ існує, але не має споживача):
+
 1. `sonar-project.properties`: конфігурація альтернативного сканера, яку жодного разу не використано.
 2. `docs/DEMO.md`: у реальному сценарії розгортання не використовувався.
 3. `docker-compose.yml`: не має споживача в поточному середовищі (але корисний для Linux/Windows).
@@ -146,7 +156,7 @@ $ git rev-list --count 0cee12c..HEAD -- scripts
 
 ### 2.1 SDD — `docs/sdd.md`
 
-Повний текст: [docs/sdd.md](sdd.md). Структура: §1 призначення і межі · §2 C4 L1 контекст · §3 **C4 L2 контейнери** ·
+Повний текст: [docs/sdd.md](../architecture/sdd.md). Структура: §1 призначення і межі · §2 C4 L1 контекст · §3 **C4 L2 контейнери** ·
 §4 компоненти (пакети, 11 сервісів, 5 адаптерів, HTTP API) з посиланнями на суміжні компоненти і вузли ISD ·
 §5 **модель даних** (ER) · §6 **контракти** (9 портів + REST) · §7 якісні атрибути.
 
@@ -164,9 +174,9 @@ flowchart TB
         pipe["<b>Quality pipeline</b><br/>[Container: Bash + Maven 3.9]"]:::container
         audit["<b>Audit tools</b><br/>[Container: Python 3]"]:::container
     end
-    sonar[["SonarQube Server 26.x"]]:::ext
-    pay[["Payment provider (FakePaymentGateway)"]]:::ext
-    mail[["Mail / SMTP (ConsoleNotificationSender)"]]:::ext
+    sonar["SonarQube Server 26.x"]:::ext
+    pay["Payment provider (FakePaymentGateway)"]:::ext
+    mail["Mail / SMTP (ConsoleNotificationSender)"]:::ext
     dev -->|"java -cp target/classes"| app
     client -->|"GET /api/health, /api/orders, /api/orders/{id}"| api
     app -->|"створює і стартує, SHOP_HTTP_PORT"| api
@@ -190,7 +200,7 @@ flowchart TB
 
 ### 2.2 ISD — `docs/isd.md`
 
-Повний текст: [docs/isd.md](isd.md). §1 топологія (локальна станція macOS, без контейнерів) і **порядок підняття** ·
+Повний текст: [docs/isd.md](../architecture/isd.md). §1 топологія (локальна станція macOS, без контейнерів) і **порядок підняття** ·
 §2 середовища dev / test / production (demo), реліз і відкат за тегом · §3 змінні середовища без секретів ·
 §4 вузли D1–D5 (на кожен посилається SDD) · D3 — **CI/CD-конвеєр** зі стадіями, тригерами і Quality Gates ·
 §5 моніторинг · §6 **резервне копіювання з RTO/RPO**.
@@ -209,9 +219,9 @@ flowchart TB
 
 | ADR | Рішення | Розглянуті альтернативи | Ключові наслідки |
 |---|---|---|---|
-| [0001](architecture/adr/0001-hexagonal-ports-and-adapters.md) | порти та адаптери + ручний DI | залишити `StoreManager`; Spring Boot DI | CBO ≤ 8; новий адаптер підключається лише в Composition Root |
-| [0002](architecture/adr/0002-in-memory-storage-with-csv-export.md) | сховище в пам'яті + CSV-експорт | PostgreSQL+JPA у Docker; файлова H2+JDBC | нуль залежностей; RPO = сеанс; назва `FileOrderRepository` історична |
-| [0003](architecture/adr/0003-embedded-jdk-http-server.md) (з краш-тесту) | HTTP API на `HttpServer` JDK | Spring Boot; Javalin/Spark | D1 став сервісом, новий порт і порядок запуску |
+| [0001](../architecture/adr/0001-hexagonal-ports-and-adapters.md) | порти та адаптери + ручний DI | залишити `StoreManager`; Spring Boot DI | CBO ≤ 8; новий адаптер підключається лише в Composition Root |
+| [0002](../architecture/adr/0002-in-memory-storage-with-csv-export.md) | сховище в пам'яті + CSV-експорт | PostgreSQL+JPA у Docker; файлова H2+JDBC | нуль залежностей; RPO = сеанс; назва `FileOrderRepository` історична |
+| [0003](../architecture/adr/0003-embedded-jdk-http-server.md) (з краш-тесту) | HTTP API на `HttpServer` JDK | Spring Boot; Javalin/Spark | D1 став сервісом, новий порт і порядок запуску |
 
 ADR-0002 чесно позначено як рішення ЛР1, записане вперше під час аудиту. Текст не переписується, а при заміні сховища
 отримає статус `Superseded`.
@@ -235,7 +245,7 @@ ADR-0002 чесно позначено як рішення ЛР1, записан
 
 Прогалини закрито на практиці: README доопрацьовано (призначення, швидкий старт, онбординг, карта документів).
 Паспорт зафіксовано комітом `docs(architecture): deliver design and infrastructure passport`; повторний аудит:
-**DOC CURRENCY GATE: PASS** ([reports/docs/02-passport.md](../reports/docs/02-passport.md)).
+**DOC CURRENCY GATE: PASS** ([reports/docs/02-passport.md](https://github.com/YehorIshchuk/shop-quality/blob/main/reports/docs/02-passport.md)).
 
 ---
 
@@ -310,7 +320,7 @@ $ curl -o /dev/null -w "%{http_code}" localhost:18080/api/orders/ORD-9
 
 ![C4 у стані FAIL: HTTP API відсутній](lab10/img/c4-containers-fail.png)
 
-**Повторний аудит метрик** ([reports/docs/03-decay-fail.md](../reports/docs/03-decay-fail.md)):
+**Повторний аудит метрик** ([reports/docs/03-decay-fail.md](https://github.com/YehorIshchuk/shop-quality/blob/main/reports/docs/03-decay-fail.md)):
 
 ```text
 $ python3 tools/doc_audit.py --stage decay-fail --gate
@@ -344,7 +354,7 @@ DOC CURRENCY GATE: FAIL   (exit code 1)
 
 ![C4 у стані PASS: HTTP API на схемі](lab10/img/c4-containers-pass.png)
 
-**Метрики до / після** ([02-passport](../reports/docs/02-passport.md) → [03-decay-fail](../reports/docs/03-decay-fail.md) → [04-restored-pass](../reports/docs/04-restored-pass.md)):
+**Метрики до / після** ([02-passport](https://github.com/YehorIshchuk/shop-quality/blob/main/reports/docs/02-passport.md) → [03-decay-fail](https://github.com/YehorIshchuk/shop-quality/blob/main/reports/docs/03-decay-fail.md) → [04-restored-pass](https://github.com/YehorIshchuk/shop-quality/blob/main/reports/docs/04-restored-pass.md)):
 
 | Метрика | Паспорт (PASS) | Краш-тест (FAIL) | Відновлення (PASS) |
 |---|---|---|---|
@@ -373,19 +383,20 @@ DOC CURRENCY GATE: FAIL   (exit code 1)
 
 ```text
 $ git shortlog -sn HEAD -- src/main/java/com/kira/shop/application
-     2	Yehor Ishchuk
+     2 Yehor Ishchuk
 $ git shortlog -sn HEAD -- src/main/java/com/kira/shop/infrastructure
-     5	Yehor Ishchuk
+     5 Yehor Ishchuk
 $ git shortlog -sn HEAD -- tools/oo_metrics.py
-     2	Yehor Ishchuk
+     2 Yehor Ishchuk
 $ git shortlog -sn HEAD -- scripts
-     6	Yehor Ishchuk
+     6 Yehor Ishchuk
 ```
 
   Bus Factor = 1 для всіх компонентів. Найвищий ризик: `tools/oo_metrics.py` (формули CK/MOOD, обмеження javalang) 🔴
   і розгортання SonarQube на macOS 🟠. План: парне володіння (другий власник у регламенті), `docs/oo-metrics.md`,
   розділ «Відомі проблеми» в ISD D4, doc-гейт у GitHub Actions (ЛР11). Бізнес-правила `StockAllocator` / `PricingService`,
   які раніше жили лише в коді, винесено в handover §4.
+
 - **Вердикт:** система в стані **«Always Ready to Handover» з одним задекларованим ризиком**. Документація повна й актуальна,
   а дрейф автоматично ловиться doc-гейтом. Організаційний Bus Factor = 1 закривається заходами 1–2 плану.
 
@@ -431,3 +442,7 @@ $ git shortlog -sn HEAD -- scripts
 **Висновок.** З 12 перевірених кроків у 4 ШІ помилився (2, 4, 8 — фактичні помилки, 5 — битий лінк), ще в одному (3)
 був неточним. Усі помилки знайдено звіркою з кодом і виправлено до фінальних комітів. Найважливіший урок краш-тесту:
 документ, написаний «впевнено» (людиною чи ШІ), але не звірений з кодом, і є Documentation Decay з першого дня.
+
+## Пов'язані документи
+
+[[sdd]] · [[isd]] · [[maintenance]] · [[handover]]

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Documentation Decay Audit (ЛР10): метрики актуальності документації з історії Git CLI.
 
-Для кожного документа з docs/doc-map.json:
+Для кожного документа з tools/doc-map.json:
   * Last Updated Age  — git log -1 --format=%cs -- <файл>          (днів від останнього коміту)
   * Doc commits       — git log --oneline -- <файл> | wc -l
 Для кожного компонента коду:
@@ -95,7 +95,7 @@ def read(path: str) -> str:
 
 def structure_checks(cfg: dict) -> list[tuple[str, str, bool]]:
     checks: list[tuple[str, str, bool]] = []
-    sdd_path, isd_path = cfg.get("sdd", "docs/sdd.md"), cfg.get("isd", "docs/isd.md")
+    sdd_path, isd_path = cfg.get("sdd", "docs/architecture/sdd.md"), cfg.get("isd", "docs/architecture/isd.md")
     sdd, isd, readme = read(sdd_path), read(isd_path), read("README.md")
     src = ROOT / "src/main/java"
     java = sorted(src.rglob("*.java"))
@@ -163,7 +163,7 @@ def render(cfg: dict, today: dt.date, stage: str) -> tuple[str, bool]:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--map", default="docs/doc-map.json")
+    ap.add_argument("--map", default="tools/doc-map.json")
     ap.add_argument("--stage", default="current")
     ap.add_argument("--today", help="YYYY-MM-DD (за замовчуванням — сьогодні)")
     ap.add_argument("--out", help="зберегти звіт у Markdown-файл")

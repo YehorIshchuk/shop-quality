@@ -1,10 +1,20 @@
+---
+title: "ADR-0001: Порти та адаптери"
+owner: Yehor Ishchuk
+status: published
+review_date: 2027-05-20
+adr: "0001"
+decision: Accepted
+tags: [architecture]
+---
+
 # ADR-0001: Шарова архітектура «порти та адаптери» з ручним DI замість God Object
 
 - **Номер:** 0001
 - **Статус:** Accepted
 - **Дата рішення:** 2026-11-15 (коміт `2afe305`, тег `lab8-godobject-pass`)
 - **Автор / власник:** Yehor Ishchuk
-- **Зачеплені документи:** [SDD §3–§6](../../sdd.md), [LAB8_REPORT](../../LAB8_REPORT.md) (історичний контекст)
+- **Зачеплені документи:** [SDD §3–§6](../sdd.md), [LAB8_REPORT](../../reports/LAB8_REPORT.md) (історичний контекст)
 
 ## Контекст
 
@@ -33,3 +43,7 @@
 - ✅ Сценарії тестуються ізольовано (`ShopServicesTest` з `ShopFixture`).
 - ⚠️ Новий адаптер (наприклад, справжня БД або HTTP API) обов'язково підключається в `ShopApplication` і описується в SDD §4.3.
 - ⚠️ Якщо з'явиться потреба у веб-контейнері, варіант B переглядається **новим ADR**, цей отримає статус `Superseded`.
+
+## Пов'язані документи
+
+[[sdd]] · [[coding-standards]] · [[0002-in-memory-storage-with-csv-export|ADR-0002]] · [[0003-embedded-jdk-http-server|ADR-0003]]

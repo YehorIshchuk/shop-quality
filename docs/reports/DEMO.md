@@ -1,8 +1,17 @@
+---
+title: DEMO (deprecated)
+owner: Yehor Ishchuk
+status: deprecated
+review_date: 2026-11-21
+superseded_by: developer/local-setup.md
+tags: [process, ops]
+---
+
 # Інструкція: розгортання, сканування станів і захист (ЛР1 + ЛР8)
 
 > ⚠️ **DEPRECATED (ЛР10, 2026-11-21).** Інструкцію написано для ЛР1/ЛР8 під Docker; фактичне розгортання на
-> робочій станції — SonarQube із ZIP на JDK 21. Актуальні джерела: [README](../README.md) (швидкий старт) і
-> [ISD](isd.md) (середовища, вузол D4). Розділи 2–5 залишаються чинними як сценарій відтворення тегів ЛР1/ЛР8.
+> робочій станції — SonarQube із ZIP на JDK 21. Актуальні джерела: [README](../index.md) (швидкий старт) і
+> [ISD](../architecture/isd.md) (середовища, вузол D4). Розділи 2–5 залишаються чинними як сценарій відтворення тегів ЛР1/ЛР8.
 
 ## 0. Що потрібно встановити
 
@@ -19,7 +28,8 @@
 ```bash
 docker compose up -d            # перший старт ~1-2 хв
 ```
-1. Відкрити http://localhost:9000, увійти `admin / admin`, задати новий пароль.
+
+1. Відкрити <http://localhost:9000>, увійти `admin / admin`, задати новий пароль.
 2. **My Account → Security → Generate Token** (тип *Global Analysis Token* або *User Token*) — скопіювати `squ_...`.
 3. Зберегти в змінну:
    - bash: `export SONAR_TOKEN=squ_...`
@@ -40,9 +50,11 @@ git checkout lab1-pass     && ./scripts/scan.sh   # 3) Виправлення ->
 git checkout lab1-refactor && ./scripts/scan.sh   # 4) Рефакторинг складності -> PASS
 git checkout main          && ./scripts/scan.sh   # 5) Фінальний стан після ЛР8 -> PASS
 ```
+
 Windows: ті самі команди з `.\scripts\setup-quality-gate.ps1` та `.\scripts\scan.ps1`.
 
 Після кожного кроку:
+
 - зробити скріншот вкладки **Overview** (статус Quality Gate + метрики) та, для FAIL, блоку з порушеними умовами;
 - зняти цифри для порівняльної таблиці: `./scripts/quality-gate-status.sh` (або `.ps1`).
 
@@ -62,11 +74,13 @@ pip install -r tools/requirements.txt
 ./scripts/sonar-api-measures.sh            # сирі curl-запити + JSON  (PowerShell: .\scripts\sonar-api-measures.ps1)
 python tools/sonar_api_report.py --stage current --oo reports/oo/current/oo-metrics.json
 ```
+
 Результати: `reports/oo/<stage>/coupling-matrix.html` (відкрити у браузері → скріншот), `oo-metrics.md`, `reports/sonar-raw/...` (сирі JSON), `reports/<stage>/ck-mood-report.md`.
 
 Для Baseline-таблиці ЛР8 відскануйте тег `lab8-baseline` (`git checkout lab8-baseline && ./scripts/scan.sh && python tools/sonar_api_report.py --stage baseline --oo reports/oo/baseline/oo-metrics.json`).
 
 Гейти (exit code 1 = FAIL):
+
 ```bash
 ./scripts/oo-gate-god-object.sh check     # CBO <= 8, LCOM <= 0.2 для класів після декомпозиції
 ./scripts/oo-gate-inheritance.sh check    # DIT <= 1, NMO = 0 для класів звітів
@@ -77,12 +91,14 @@ python tools/sonar_api_report.py --stage current --oo reports/oo/current/oo-metr
 
 ## 4. Сценарій захисту (≈5 хв)
 
-**ЛР1**
+**ЛР1:**
+
 1. SonarQube → проєкт *Shop Quality* → зелений **Passed**. Назвати 4 умови gate (див. LAB1_REPORT §3).
 2. Термінал: `git log --oneline --decorate` — показати теги `lab1-baseline`, `lab1-fail`, `lab1-pass`, `lab1-refactor`.
 3. IDE: `git diff lab1-pass lab1-refactor -- src/main/java/com/kira/shop/service/StoreManager.java` — «до/після» `placeOrder` (Cognitive 49 → 2) та `summarize` (40 → 0); найгірший метод після — 5: Guard Clauses + Extract Method.
 
-**ЛР8**
+**ЛР8:**
+
 1. `reports/oo/baseline/coupling-matrix.html` — червоний рядок `StoreManager` (CBO 19).
 2. `git show lab8-godobject-fail --stat` + `docs/lab8/shotgun-surgery-build.log` — 7 помилок компіляції від однієї зміни.
 3. `./scripts/oo-gate-god-object.sh check` → `OO GATE: PASS`; схема в `docs/lab8/architecture-blueprint.md`.
@@ -95,3 +111,7 @@ python tools/sonar_api_report.py --stage current --oo reports/oo/current/oo-metr
 - **LCOM** — брак згуртованості: наскільки методи класу працюють з *різними* полями. Високий LCOM → у класі живуть кілька незалежних відповідальностей, його треба розділити (LCOM4 = кількість таких «островів»).
 - **God Object vs Inheritance Hell.** God Object — проблема *горизонтальна*: один клас знає/робить забагато (високі CBO, LCOM, WMC); лікується декомпозицією за SRP + DIP. Inheritance Hell — проблема *вертикальна*: глибока ієрархія з масовими перевизначеннями (DIT, NMO) — зміна в батьку каскадно ламає нащадків (Fragile Base Class); лікується композицією замість успадкування.
 - **Чому метрики CK рахує окремий інструмент.** SonarQube прибрав LCOM4 ще у 4.x і ніколи не мав CBO/DIT у ядрі; запит із ключами `coupling_between_objects,lcom4` повертає `metric keys are not found` (див. `reports/sonar-raw/.../ck-legacy-keys.json`). Тому Web API дає `complexity` (WMC), `cognitive_complexity`, `ncloc` тощо, а CBO/LCOM/DIT/MOOD — `tools/oo_metrics.py`.
+
+## Пов'язані документи
+
+[[local-setup]] · [[isd]]

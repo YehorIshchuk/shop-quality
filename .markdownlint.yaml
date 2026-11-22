@@ -1,0 +1,11 @@
+# markdownlint — стиль розмітки документації (ЛР11, стадія lint конвеєра docs.yml)
+default: true
+MD013: false          # довжина рядка: таблиці й посилання в документації довгі за природою
+MD033:                # inline HTML: дозволено лише потрібне базі знань
+  allowed_elements: [a, br, b, swagger-ui, details, summary]
+MD041: false          # перший рядок — front matter / include-директива, а не H1
+MD024:
+  siblings_only: true # однакові підзаголовки в різних розділах (### Додано у CHANGELOG)
+MD060: false          # стиль вирівнювання таблиць (компактні таблиці без вирівнювання пробілами)
+MD025:
+  front_matter_title: ""   # title у front matter — метадані для MkDocs, не другий H1

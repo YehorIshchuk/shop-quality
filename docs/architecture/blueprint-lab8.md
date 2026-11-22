@@ -1,6 +1,15 @@
+---
+title: Blueprint ЛР8 (deprecated)
+owner: Yehor Ishchuk
+status: deprecated
+review_date: 2026-11-21
+superseded_by: architecture/sdd.md
+tags: [architecture, process]
+---
+
 # Архітектурний Blueprint після декомпозиції God Object
 
-> ⚠️ **DEPRECATED → замінено [docs/sdd.md](../sdd.md) (ЛР10, 2026-11-21).** Розділ «Було» — історія ЛР8;
+> ⚠️ **DEPRECATED → замінено [SDD](sdd.md) (ЛР10, 2026-11-21).** Розділ «Було» — історія ЛР8;
 > актуальна структура компонентів і контракти портів підтримуються лише в SDD.
 
 ## Було: `StoreManager` (CBO = 19, LCOM = 0.855, WMC = 77 за Sonar (67 за CK), 29 методів)
@@ -73,6 +82,7 @@ flowchart TB
 ```
 
 Ключові властивості:
+
 - жоден сервіс не посилається на інший сервіс чи на клас інфраструктури — лише на інтерфейси (DIP);
 - усі залежності передаються через конструктор; конкретні реалізації зв'язуються в одному місці —
   Composition Root (`ShopApplication`, у тестах — `ShopFixture`);
@@ -92,3 +102,7 @@ flowchart TB
 | PricingService | знижки, доставка | 5 | 0.0 | 2 | 13 |
 | StockAllocator | правила резервування | 7 | 0.0 | 1 | 13 |
 | SalesLedger | статистика продажів | 3 | 0.0 | 1 | 6 |
+
+## Пов'язані документи
+
+[[sdd]] · [[0001-hexagonal-ports-and-adapters|ADR-0001]]

@@ -1,8 +1,16 @@
+---
+title: Звіт ЛР1
+owner: Yehor Ishchuk
+status: published
+review_date: 2027-11-22
+tags: [process]
+---
+
 # Лабораторна робота №1. Автоматизований контроль якості програмного проєкту
 
 > 🗄️ **Історичний документ процесу (ЛР1, 2026-11-15)** — фіксує стан системи на момент виконання і не оновлюється.
-> Актуальна архітектура — [SDD](sdd.md), розгортання — [ISD](isd.md).
-
+> Актуальна архітектура — [SDD](../architecture/sdd.md), розгортання — [ISD](../architecture/isd.md).
+<!-- -->
 > Поля `⟨…⟩` заповнюються з SonarQube після сканування станів за інструкцією `docs/DEMO.md` §2.
 > Значення Cognitive/Cyclomatic Complexity нижче пораховано інструментом `tools/oo_metrics.py`
 > за методикою SonarSource — звірте їх із вкладкою *Measures → Complexity* у SonarQube.
@@ -60,11 +68,13 @@
 1. **Дублювання (Overall, умова 3).** `buildCustomerSummary` скопійовано у `buildCustomerSummaryForMonth`
    (≈ 40 рядків, відрізняється однією умовою фільтрації).
 2. **Нові Bugs (New Code, умова 1).**
+
    ```java
    if (code == "WELCOME10") {          // java:S4973 — порівняння посилань, а не вмісту рядків
        rate = new BigDecimal(0.1);     // java:S2111 — 0.1000000000000000055511151231257827…
    }
    ```
+
    Тест при цьому проходить (літерали інтерновані) — тобто дефект прихований і виявляється лише SAST.
 3. **Security Hotspot (New Code, умова 2).** `new Random()` для генерації кодів купонів (`java:S2245`) —
    передбачуваний PRNG.
@@ -74,6 +84,7 @@
 ## 5. Відновлення та рефакторинг
 
 **Тег `lab1-pass` — виправлення (не видалення!):**
+
 - дубль винесено у багаторазовий метод `summarize(Customer, Predicate<Order> filter, String label)`;
   обидва публічні методи стали однорядковими делегатами;
 - купони — таблиця `Map<String, BigDecimal> COUPON_RATES` (немає порівняння рядків взагалі),
@@ -90,6 +101,7 @@
 Найгірші з винесених методів — `resolveQuantity` / `recommendTier`, Cognitive **5** (≤ 15); найгірший метод проєкту теж 5. Методів > 15: **2 → 0**.
 
 «До» (фрагмент):
+
 ```java
 if (customer != null) {
     if (cart != null && !cart.isEmpty()) {
@@ -103,7 +115,9 @@ if (customer != null) {
                     } else {
                         if (customer.getTier() == CustomerTier.GOLD || ...) {   // вкладеність 6
 ```
+
 «Після»:
+
 ```java
 requireArgument(customer != null, "Customer is required");
 requireArgument(cart != null && !cart.isEmpty(), "Cart is empty");
@@ -114,6 +128,7 @@ for (Map.Entry<String, Integer> entry : cart.entrySet()) {
 }
 reserveStock(order);
 ```
+
 Повний diff: `git diff lab1-pass lab1-refactor`.
 
 **Технічний борг.** SonarQube рахує борг за SQALE: кожне правило має ремедіаційну функцію;
@@ -147,3 +162,7 @@ Cyclomatic 13 (помірно), але Cognitive 49 (критично); післ
 одразу виправити весь legacy, а пороги на загальному коді фіксують «нижню межу» якості.
 Експеримент показав, що прихований дефект (`==` для рядків) проходить юніт-тести, але
 зупиняється SAST-гейтом ще до злиття.
+
+## Пов'язані документи
+
+[[coding-standards]]

@@ -11,3 +11,6 @@ reports/oo/current/
 reports/current/
 .DS_Store
 .obsidian/
+site/
+.venv/
+sdk-client/

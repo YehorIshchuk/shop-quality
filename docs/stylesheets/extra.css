@@ -1,0 +1,3 @@
+/* status: published — звичайний стан, значок у навігації не потрібен; draft / in-review / deprecated — видно. */
+.md-status--published { display: none; }
+.md-status--draft:after, .md-status--in-review:after { mask-image: var(--md-status--new); -webkit-mask-image: var(--md-status--new); }

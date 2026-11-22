@@ -1,6 +1,9 @@
 ---
-title: Infrastructure Specification Document — Shop Quality
+title: ISD — Infrastructure Specification
 owner: Yehor Ishchuk
+status: published
+review_date: 2027-02-19
+tags: [ops, architecture]
 type: product / operational
 audience: DevOps, розробники
 review_cycle_days: 90
@@ -10,7 +13,7 @@ change_log: 2026-11-21 — D1 став довгоживучим сервісом
 
 # ISD — Infrastructure Specification Document: Shop Quality
 
-> **Де і на чому працює система.** Внутрішня структура — [SDD](sdd.md). Рішення — [ADR](architecture/adr/).
+> **Де і на чому працює система.** Внутрішня структура — [SDD](sdd.md). Рішення — [ADR](adr/index.md).
 > Кожен компонент SDD посилається сюди на свій вузол розгортання `D1…D6`.
 
 ## 1. Топологія розгортання
@@ -43,6 +46,7 @@ flowchart TB
 ```
 
 **Порядок підняття сервісів (змінено 2026-11-21):**
+
 1. D3 — `mvn -B clean verify` (збирає `target/classes`, проганяє тести; SonarQube для цього не потрібен).
 2. **D1 — запустити як довгоживучий сервіс** в окремому терміналі; переконатися, що порт `8080` (або `SHOP_HTTP_PORT`)
    вільний; дочекатися рядка `HTTP API listening…` і перевірити `curl -s localhost:8080/api/health` → `{"status":"UP"}`.
@@ -76,7 +80,9 @@ flowchart TB
 ## 4. Вузли розгортання
 
 <a id="d1"></a>
+
 ### D1 · Shop Core App (JVM)
+
 - Збірка: `mvn -B clean verify` → `target/classes`, звіт покриття `target/site/jacoco/jacoco.xml`.
 - Запуск: `java -cp target/classes com.kira.shop.ShopApplication` — **довгоживучий процес-сервіс**: виконує демо-сценарій,
   друкує місячний звіт і резюме клієнта в лог (`java.util.logging`, stderr), стартує HTTP API і працює до `Ctrl+C`.
@@ -85,12 +91,15 @@ flowchart TB
 - Тільки локальна мережа/демо: API без автентифікації, порт не публікувати назовні (SDD §7).
 
 <a id="d2"></a>
+
 ### D2 · Сховища даних
-- Каталог, залишки, замовлення, статистика — колекції в **JVM heap** процесу D1 (див. [ADR-0002](architecture/adr/0002-in-memory-storage-with-csv-export.md)).
+
+- Каталог, залишки, замовлення, статистика — колекції в **JVM heap** процесу D1 (див. [ADR-0002](adr/0002-in-memory-storage-with-csv-export.md)).
 - Персистентний артефакт — CSV-експорт замовлень `FileOrderRepository.exportCsv(Path)`, шлях задає викликач (UTF-8, `;`).
 - Сховище SonarQube — вбудована H2 у `sonarqube-26.x/data/` (лише для навчального інстансу).
 
 <a id="d3"></a>
+
 ### D3 · CI/CD-конвеєр (локальний)
 
 Хмарного CI немає. Конвеєр — Bash-скрипти, які запускаються вручну перед `git push` і на кожному стані-тегу.
@@ -109,11 +118,13 @@ flowchart LR
 | build + test + coverage | `mvn -B clean verify` | кожен коміт (вручну) | усі тести зелені |
 | SAST | `scripts/scan.sh` (`sonar:sonar`, `sonar.qualitygate.wait=true`) | перед push, на кожному тезі | «Shop-Quality-Gate»: new bugs = 0, new hotspots reviewed = 100 %, duplicated lines ≤ 3 %, Maintainability = A |
 | OO-гейти (ЛР8) | `scripts/oo-gate-god-object.sh check`, `scripts/oo-gate-inheritance.sh check` | зміни в `application/`, `report/` | CBO ≤ 8, LCOM ≤ 0.2, DIT ≤ 1, NMO = 0 |
-| Doc-гейт (ЛР10) | `python3 tools/doc_audit.py --gate` | кожна зміна коду (правило [maintenance.md](maintenance.md)) | `DOC CURRENCY GATE: PASS` |
+| Doc-гейт (ЛР10) | `python3 tools/doc_audit.py --gate` | кожна зміна коду (правило [maintenance.md](../developer/maintenance.md)) | `DOC CURRENCY GATE: PASS` |
 | реліз | `git tag -a <name> && git push --follow-tags` | стан лабораторної | усі гейти PASS |
 
 <a id="d4"></a>
+
 ### D4 · SonarQube Server 26.x (ZIP-дистрибутив)
+
 - Каталог: `~/sonarqube-26.x`; старт: `export SONAR_JAVA_PATH=…temurin-21…/bin/java && ./bin/macosx-universal-64/sonar.sh start`.
 - Вимоги: JDK 21 (на JDK 17 — `UnsupportedClassVersionError`), **≥ 23 ГБ вільного місця** (поріг disk watermark Elasticsearch),
   у macOS — Full Disk Access для Terminal, якщо дистрибутив у `~/Downloads`.
@@ -121,7 +132,9 @@ flowchart LR
 - Налаштування гейта відтворюється скриптом `scripts/setup-quality-gate.sh` (ідемпотентний).
 
 <a id="d5"></a>
+
 ### D5 · Audit tools (Python)
+
 - `pip install -r tools/requirements.txt` (`javalang==0.13.0`), Python ≥ 3.9.
 - `tools/oo_metrics.py` → `reports/oo/<stage>/`; `tools/sonar_api_report.py` → таблиці з Web API; `tools/doc_audit.py` → `reports/docs/`.
 
@@ -137,11 +150,16 @@ flowchart LR
 | Робота D1 | лог JUL у stderr | рядки звіту без `SEVERE` | розбір стек-трейсу, тест на регресію |
 
 <a id="d6-backup"></a><a id="d6"></a>
+
 ## 6. Резервне копіювання та відновлення (RTO / RPO)
 
 | Актив | Резервна копія | RPO (допустима втрата) | RTO (час відновлення) | Процедура відновлення |
 |---|---|---|---|---|
 | Код, документація, теги | GitHub `YehorIshchuk/shop-quality` (D6) | ≤ 1 робочий день (push щонайменше раз на день роботи) | ≤ 15 хв | `git clone` → `mvn -B clean verify` |
 | Дані замовлень/залишків (D2) | немає (in-memory за ADR-0002); ручний CSV-експорт | весь сеанс роботи процесу (тепер процес довгоживучий — втрата при кожному перезапуску D1) | ≈ 5 с (перезапуск D1 до `GET /api/health` = 200, демо-дані засіваються заново) | `Ctrl+C` → запустити D1 → health-check |
-| Історія аналізів SonarQube | копія `data/` при зупиненому D4 (необов'язково) | усі аналізи після останньої копії | ≤ 30 хв | перевстановити ZIP → `setup-quality-gate.sh` → пересканувати теги ([DEMO.md §2](DEMO.md)) |
+| Історія аналізів SonarQube | копія `data/` при зупиненому D4 (необов'язково) | усі аналізи після останньої копії | ≤ 30 хв | перевстановити ZIP → `setup-quality-gate.sh` → пересканувати теги ([DEMO.md §2](../reports/DEMO.md)) |
 | Токен `SONAR_TOKEN` | не зберігається | — | ≤ 2 хв | згенерувати новий у My Account → Security, старий — Revoke |
+
+## Пов'язані документи
+
+[[sdd]] · [[0002-in-memory-storage-with-csv-export|ADR-0002]] · [[0003-embedded-jdk-http-server|ADR-0003]] · [[local-setup]] · [[maintenance]]

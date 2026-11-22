@@ -1,6 +1,9 @@
 ---
-title: System Design Document — Shop Quality
+title: SDD — System Design Document
 owner: Yehor Ishchuk
+status: published
+review_date: 2027-05-20
+tags: [architecture]
 type: product / architectural
 audience: розробники, QA
 review_cycle_days: 180
@@ -11,7 +14,7 @@ change_log: 2026-11-21 — додано HTTP API (api/ShopHttpApi), ADR-0003
 # SDD — System Design Document: Shop Quality
 
 > **Як влаштована система всередині.** Де і на чому вона працює — [ISD](isd.md).
-> Чому рішення саме такі — [ADR](architecture/adr/). Регламент супроводу — [maintenance.md](maintenance.md).
+> Чому рішення саме такі — [ADR](adr/index.md). Регламент супроводу — [maintenance.md](../developer/maintenance.md).
 
 ## 1. Призначення та межі системи
 
@@ -22,7 +25,7 @@ read-only HTTP API замовлень.
 аудит документації (ЛР10).
 
 Поза межами системи: реальний платіжний провайдер, реальна пошта, персистентна БД. Їх емулюють адаптери
-`FakePaymentGateway` і `ConsoleNotificationSender`, а дані зберігаються в пам'яті JVM (див. [ADR-0002](architecture/adr/0002-in-memory-storage-with-csv-export.md)).
+`FakePaymentGateway` і `ConsoleNotificationSender`, а дані зберігаються в пам'яті JVM (див. [ADR-0002](adr/0002-in-memory-storage-with-csv-export.md)).
 
 ## 2. C4 Level 1 — контекст
 
@@ -31,11 +34,11 @@ flowchart LR
     dev([👤 Розробник / оператор<br/>запускає демо, сканування, аудит]):::person
     qa([👤 QA / викладач<br/>перевіряє Quality Gate і звіти]):::person
     client([👤 API-клієнт<br/>curl, фронтенд, інтеграції]):::person
-    shop[["Shop Quality<br/>[Software System]<br/>ядро інтернет-магазину"]]:::system
-    sonar[["SonarQube Server<br/>[External System]<br/>SAST + Quality Gate"]]:::ext
-    pay[["Платіжний провайдер<br/>[External System, емуляція]"]]:::ext
-    mail[["Пошта / SMTP<br/>[External System, емуляція]"]]:::ext
-    gh[["GitHub<br/>[External System]<br/>віддалений репозиторій"]]:::ext
+    shop["Shop Quality<br/>[Software System]<br/>ядро інтернет-магазину"]:::system
+    sonar["SonarQube Server<br/>[External System]<br/>SAST + Quality Gate"]:::ext
+    pay["Платіжний провайдер<br/>[External System, емуляція]"]:::ext
+    mail["Пошта / SMTP<br/>[External System, емуляція]"]:::ext
+    gh["GitHub<br/>[External System]<br/>віддалений репозиторій"]:::ext
     dev -->|"запускає, змінює код"| shop
     client -->|"HTTP GET /api/orders, :8080"| shop
     qa -->|"переглядає метрики"| sonar
@@ -62,9 +65,9 @@ flowchart TB
         pipe["<b>Quality pipeline</b><br/>[Container: Bash + Maven 3.9]<br/>scripts/scan.sh · JUnit 5 · JaCoCo"]:::container
         audit["<b>Audit tools</b><br/>[Container: Python 3]<br/>oo_metrics.py · doc_audit.py ·<br/>sonar_api_report.py"]:::container
     end
-    sonar[["SonarQube Server 26.x<br/>[External: Java 21 + embedded H2]"]]:::ext
-    pay[["Payment provider<br/>(FakePaymentGateway)"]]:::ext
-    mail[["Mail / SMTP<br/>(ConsoleNotificationSender)"]]:::ext
+    sonar["SonarQube Server 26.x<br/>[External: Java 21 + embedded H2]"]:::ext
+    pay["Payment provider<br/>(FakePaymentGateway)"]:::ext
+    mail["Mail / SMTP<br/>(ConsoleNotificationSender)"]:::ext
     dev -->|"java -cp target/classes"| app
     client -->|"GET /api/health, /api/orders, /api/orders/{id}"| api
     app -->|"створює і стартує, SHOP_HTTP_PORT"| api
@@ -86,7 +89,7 @@ flowchart TB
 
 ## 4. Компоненти (C4 Level 3)
 
-Шари (див. [ADR-0001](architecture/adr/0001-hexagonal-ports-and-adapters.md)): `domain/` ← `application/` →
+Шари (див. [ADR-0001](adr/0001-hexagonal-ports-and-adapters.md)): `domain/` ← `application/` →
 `application/port/` ← `infrastructure/`. Залежності спрямовані **до абстракцій**: сервіси знають лише порти,
 конкретні адаптери підставляє тільки `ShopApplication`.
 
@@ -135,7 +138,7 @@ flowchart TB
 |---|---|---|---|
 | `ShopHttpApi` | вбудований `com.sun.net.httpserver.HttpServer` JDK; маршрути `/api/health`, `/api/orders`, `/api/orders/{id}`; серіалізація `OrderDto` у JSON; лише GET (інакше 405) | порт `OrderStore` (не знає конкретного сховища), `OrderMapper` | [ISD D1](isd.md#d1) — порт `SHOP_HTTP_PORT`, за замовч. 8080 |
 
-Вибір вбудованого сервера замість Spring Boot — [ADR-0003](architecture/adr/0003-embedded-jdk-http-server.md).
+Вибір вбудованого сервера замість Spring Boot — [ADR-0003](adr/0003-embedded-jdk-http-server.md).
 
 **Composition Root** — `ShopApplication.main`: створює адаптери, підставляє їх у конструктори сервісів,
 виконує демо-сценарій (2 товари → замовлення GOLD-клієнта → оплата → місячний звіт), потім **створює `ShopHttpApi`
@@ -218,3 +221,7 @@ erDiagram
 - **Надійність даних:** дані живуть лише в пам'яті процесу — RPO/RTO див. [ISD §6](isd.md#d6-backup).
 - **Без зовнішніх runtime-залежностей:** лише JDK (включно з модулем `jdk.httpserver`); JUnit 5 — тільки для тестів.
 - **Безпека API:** лише читання, без автентифікації — призначене для локального демо; перед відкриттям назовні потрібен новий ADR.
+
+## Пов'язані документи
+
+[[isd]] · [[0001-hexagonal-ports-and-adapters|ADR-0001]] · [[0002-in-memory-storage-with-csv-export|ADR-0002]] · [[0003-embedded-jdk-http-server|ADR-0003]] · [[coding-standards]] · [[handover]]

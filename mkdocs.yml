@@ -1,0 +1,107 @@
+# База знань Shop Quality — Documentation as Code (ЛР11).
+# Збірка: mkdocs build --strict   ·   Локально: mkdocs serve   ·   Публікація: .github/workflows/docs.yml
+site_name: Shop Quality — база знань
+site_description: Ядро інтернет-магазину на Java 17 — документація за пірамідою README → Developer → API → Architecture
+site_author: Yehor Ishchuk
+site_url: https://yehorishchuk.github.io/shop-quality/
+repo_url: https://github.com/YehorIshchuk/shop-quality
+repo_name: YehorIshchuk/shop-quality
+edit_uri: edit/main/docs/
+copyright: "© 2026 Yehor Ishchuk · Documentation as Code"
+
+theme:
+  name: material
+  language: uk
+  features:
+    - navigation.sections   # рівні піраміди — окремі секції меню
+    - navigation.indexes    # index.md секції = її оглядова сторінка
+    - navigation.top
+    - navigation.footer
+    - search.highlight
+    - content.code.copy
+    - content.action.edit
+  palette:
+    - scheme: default
+      primary: indigo
+      toggle: {icon: material/brightness-7, name: Темна тема}
+    - scheme: slate
+      primary: indigo
+      toggle: {icon: material/brightness-4, name: Світла тема}
+
+# Strict-контроль (ЛР11, Завдання 3): кожне з цього списку — WARNING, а mkdocs build --strict
+# перетворює будь-який WARNING на Exit Code 1 («не збирається — не їде»).
+validation:
+  omitted_files: warn        # orphan-сторінка: є в docs/, але немає в nav
+  absolute_links: warn
+  unrecognized_links: warn
+  anchors: warn              # посилання на неіснуючий заголовок
+  not_found: warn            # мертве посилання на неіснуючу сторінку
+
+nav:
+  - "1 · Що це і як запустити": index.md
+  - "2 · Розробникам":
+      - developer/index.md
+      - developer/CONTRIBUTING.md
+      - developer/local-setup.md
+      - developer/coding-standards.md
+      - developer/maintenance.md
+      - developer/handover.md
+  - "3 · API":
+      - api/index.md
+      - api/reference.md
+  - "4 · Архітектура":
+      - architecture/index.md
+      - architecture/sdd.md
+      - architecture/isd.md
+      - "Кущ ADR":
+          - architecture/adr/index.md
+          - architecture/adr/0001-hexagonal-ports-and-adapters.md
+          - architecture/adr/0002-in-memory-storage-with-csv-export.md
+          - architecture/adr/0003-embedded-jdk-http-server.md
+      - architecture/blueprint-lab8.md
+  - "Історія змін": changelog.md
+  - "Архів процесу":
+      - reports/index.md
+      - reports/LAB1_REPORT.md
+      - reports/LAB8_REPORT.md
+      - reports/LAB10_REPORT.md
+      - reports/DEMO.md
+  - "Теги": tags.md
+
+extra_css:
+  - stylesheets/extra.css
+
+extra:
+  status:                          # front matter status → значок і підказка в навігації
+    draft: Чернетка
+    in-review: На рев'ю
+    deprecated: Застаріла сторінка — див. актуальний документ
+
+plugins:
+  - search:
+      lang: [ru, en]               # lunr не має українського стемера; ru дає найближчу морфологію
+  - tags                           # front matter tags → сторінка «Теги» (ті самі теги бачить Obsidian)
+  - roamlinks                      # [[wikilinks]] з Obsidian → звичайні посилання на сайті
+  - include-markdown               # docs/index.md і changelog.md рендеряться з README.md / CHANGELOG.md (SSOT)
+  - mermaid2                       # C4- і ER-діаграми з ЛР10
+  - swagger-ui-tag                 # <swagger-ui src="openapi.yaml"/> — довідка API з контракту (SSOT)
+  - git-revision-date-localized:   # дата останнього коміту сторінки — основа метрики актуальності
+      type: date
+      locale: uk
+      enable_creation_date: true
+      fallback_to_build_date: true
+      strict: false                # нова ще не закомічена сторінка — не дефект документації
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:mermaid2.fence_mermaid_custom
