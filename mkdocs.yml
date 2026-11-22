@@ -67,6 +67,7 @@ nav:
           - changes/RFC-001.md
           - changes/CCB-001.md
           - changes/release-checklist.md
+      - legacy/oo-metrics.md
       - maintenance-plan.md
   - "Історія змін": changelog.md
   - "Архів процесу":
