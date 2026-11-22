@@ -48,4 +48,36 @@ class ShopHttpApiTest {
             api.stop();
         }
     }
+
+    @Test
+    void conformsToOpenApiContract() throws Exception {
+        ShopFixture shop = new ShopFixture();
+        ShopHttpApi api = new ShopHttpApi(shop.orders, 0);
+        api.start();
+        try {
+            HttpResponse<String> deleteHealth = call(api, "DELETE", "/api/health");
+            assertEquals(405, deleteHealth.statusCode());
+            assertEquals("GET", deleteHealth.headers().firstValue("Allow").orElse(""));
+            assertEquals("{\"error\":\"Method not allowed\"}", deleteHealth.body());
+
+            assertEquals("GET", call(api, "PUT", "/api/orders/ORD-1").headers().firstValue("Allow").orElse(""));
+
+            HttpResponse<String> controlChars = call(api, "GET", "/api/orders/a%0Ab%01");
+            assertEquals(404, controlChars.statusCode());
+            assertEquals("{\"error\":\"Order not found\",\"orderId\":\"a\\nb\\u0001\"}", controlChars.body());
+
+            HttpResponse<String> health = call(api, "GET", "/api/health");
+            assertEquals("*", health.headers().firstValue("Access-Control-Allow-Origin").orElse(""));
+            assertTrue(health.headers().firstValue("Content-Type").orElse("").startsWith("application/json"));
+
+            assertEquals(404, call(api, "GET", "/api/healthz").statusCode());
+        } finally {
+            api.stop();
+        }
+    }
+
+    @Test
+    void escapesJsonPerRfc8259() {
+        assertEquals("q\\\"b\\\\s\\t\\u001f", ShopHttpApi.escape("q\"b\\s\t\u001f"));
+    }
 }

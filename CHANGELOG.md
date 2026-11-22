@@ -9,6 +9,14 @@
 
 - База знань MkDocs Material за пірамідою README → Developer → API → Architecture (ЛР11).
 - Front matter-паспорти (`owner`, `status`, `review_date`, `tags`) у кожному документі, `.github/CODEOWNERS`.
+- OpenAPI-контракт `docs/api/openapi.yaml` (API 1.0.0), правила Spectral, довідка Swagger UI, клієнтський SDK, Javadoc.
+- HTTP API: заголовок `Access-Control-Allow-Origin: *` для Swagger UI «Try it out».
+
+### Виправлено
+
+- HTTP API приведено до контракту (знайдено Schemathesis): JSON-екранування керуючих символів у `orderId`,
+  `405` для не-GET на `/api/health`, заголовок `Allow: GET` у всіх `405`, `500` зі спільним `Error`
+  замість обірваного з'єднання.
 
 ### Змінено
 

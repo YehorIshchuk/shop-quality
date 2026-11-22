@@ -8,7 +8,7 @@ type: product / architectural
 audience: розробники, QA
 review_cycle_days: 180
 last_reviewed: 2026-11-21
-change_log: 2026-11-21 — додано HTTP API (api/ShopHttpApi), ADR-0003
+change_log: "2026-11-22 — §6.2 посилається на OpenAPI-контракт замість копії; ShopHttpApi приведено до контракту"
 ---
 
 # SDD — System Design Document: Shop Quality
@@ -136,7 +136,7 @@ flowchart TB
 
 | Компонент | Відповідальність | Залежить від | Розгортання |
 |---|---|---|---|
-| `ShopHttpApi` | вбудований `com.sun.net.httpserver.HttpServer` JDK; маршрути `/api/health`, `/api/orders`, `/api/orders/{id}`; серіалізація `OrderDto` у JSON; лише GET (інакше 405) | порт `OrderStore` (не знає конкретного сховища), `OrderMapper` | [ISD D1](isd.md#d1) — порт `SHOP_HTTP_PORT`, за замовч. 8080 |
+| `ShopHttpApi` | вбудований `com.sun.net.httpserver.HttpServer` JDK; маршрути `/api/health`, `/api/orders`, `/api/orders/{id}`; серіалізація `OrderDto` у JSON з екрануванням за RFC 8259; обгортка `readOnly`: лише GET (інакше 405 + `Allow: GET`), неочікувана помилка → 500 зі спільним `Error`; заголовок `Access-Control-Allow-Origin: *` для Swagger UI | порт `OrderStore` (не знає конкретного сховища), `OrderMapper` | [ISD D1](isd.md#d1) — порт `SHOP_HTTP_PORT`, за замовч. 8080 |
 
 Вибір вбудованого сервера замість Spring Boot — [ADR-0003](adr/0003-embedded-jdk-http-server.md).
 
@@ -200,19 +200,14 @@ erDiagram
 
 ### 6.2 HTTP API (зовнішній контракт, `ShopHttpApi`)
 
-| Запит | Статус | Тіло відповіді (`application/json; charset=utf-8`) |
-|---|---|---|
-| `GET /api/health` | 200 | `{"status":"UP"}` |
-| `GET /api/orders` | 200 | масив `Order` (порожній — `[]`) |
-| `GET /api/orders/{id}` | 200 / 404 | `Order` / `{"error":"Order not found","orderId":"{id}"}` |
-| `POST`/`PUT`/`DELETE` `/api/orders…` | 405 | `{"error":"Method not allowed"}` |
-
-Схема `Order`: `orderId` string · `customer` string · `status` enum `NEW|PAID|SHIPPED|DELIVERED|CANCELLED` ·
-`items` int (сумарна кількість одиниць) · `total` string-десяткове з 2 знаками (щоб не втрачати точність `BigDecimal`).
+Маршрути `/api/health`, `/api/orders`, `/api/orders/{orderId}` описано **лише** в машинно-читному контракті
+[`openapi.yaml`](../api/openapi.yaml) (рівень 3, [API Docs](../api/index.md)) — схеми `Order`, `Health`, спільний `Error`,
+коди 200 / 404 / 405 / 500 і приклади. SDD навмисно не дублює контракт: один факт — одне джерело.
+Відповідність коду контракту перевіряє Schemathesis у конвеєрі документації.
 
 Поведінкові контракти для QA перевіряються тестами `src/test/java`: `OrderTest` (розрахунок суми, статуси),
 `ShopServicesTest` (use-case сценарії, відмова оплати > 50 000), `ReportTest` (рендер звітів),
-`ShopHttpApiTest` (маршрути, коди 200/404/405, JSON-поля).
+`ShopHttpApiTest` (маршрути, коди 200/404/405, `Allow`, CORS, екранування JSON); Schemathesis — відповідність OpenAPI-контракту.
 
 ## 7. Якісні атрибути та обмеження
 

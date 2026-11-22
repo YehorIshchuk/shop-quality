@@ -17,13 +17,14 @@ tags: [api]
 | Перевірка | Чим | Де в конвеєрі |
 |---|---|---|
 | якість контракту | Spectral, правила `.spectral.yaml` | стадія `api-contract` |
-| відповідність живому коду (контрактний дрейф) | Schemathesis проти запущеного API | стадія `api-contract` |
+| відповідність живому коду (контрактний дрейф) | Schemathesis проти запущеного API: 470 тест-кейсів, 0 розбіжностей | стадія `api-contract` |
 | клієнтський SDK | OpenAPI Generator (`-g java --library native`) | стадія `api-contract`, артефакт `sdk-client` |
 
 ## Інтерактивна довідка (Swagger UI)
 
 Щоб «Try it out» працював, запустіть API локально (`java -cp target/classes com.kira.shop.ShopApplication`) —
-сервер у контракті `http://localhost:8080`.
+сервер у контракті `http://localhost:8080`. API віддає `Access-Control-Allow-Origin: *`, тож виклик працює
+зі сторінки `mkdocs serve` і з GitHub Pages (Chrome може попросити дозвіл на доступ до локальної мережі).
 
 <swagger-ui src="openapi.yaml"/>
 

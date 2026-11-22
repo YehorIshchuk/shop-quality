@@ -89,6 +89,7 @@ flowchart TB
 - Відкриває TCP-порт **8080** (`SHOP_HTTP_PORT`) на всіх інтерфейсах; при зайнятому порту падає на старті з
   `Cannot bind HTTP API to port …`. Health-check: `GET /api/health`. Зовнішніх runtime-залежностей немає (лише JDK, модуль `jdk.httpserver`).
 - Тільки локальна мережа/демо: API без автентифікації, порт не публікувати назовні (SDD §7).
+- Відповіді містять `Access-Control-Allow-Origin: *`, щоб «Try it out» у Swagger UI бази знань (`mkdocs serve` або GitHub Pages) міг викликати локальний API.
 
 <a id="d2"></a>
 

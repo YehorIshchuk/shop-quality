@@ -1,0 +1,53 @@
+$ schemathesis run docs/api/openapi.yaml --url http://localhost:18080 --checks all --max-examples 60   # після fix(api)
+Schemathesis v4.33.4
+━━━━━━━━━━━━━━━━━━━━
+
+ ✅  Loaded specification from /home/claude/gh-shop/docs/api/openapi.yaml (in
+ 0.24s)
+
+     Base URL:         http://localhost:18080
+     Specification:    Open API 3.0.3
+     Operations:       3 selected / 3 total
+
+ ✅  API capabilities:
+
+     Supports NULL byte in headers:                            ✓
+     Accepts backslash and control characters in URL paths:    ✓
+
+ ✅  Examples (in 0.14s)
+
+     ✅ 1 passed  ⏭  2 skipped
+
+ ✅  Coverage (in 1.31s)
+
+     ✅ 3 passed
+
+ ✅  Fuzzing (in 3.14s)
+
+     ✅ 3 passed
+
+ ✅  Stateful (in 18.08s)
+
+     Scenarios:    68
+     API Links:    1 covered / 1 selected / 1 total (1 inferred)
+
+     ✅ 68 passed
+
+=================================== SUMMARY ====================================
+
+API Operations:
+  Selected: 3/3
+  Tested: 3
+
+Test Phases:
+  ✅ Examples
+  ✅ Coverage
+  ✅ Fuzzing
+  ✅ Stateful
+
+Test cases:
+  470 generated, 470 passed
+
+Seed: 289414088455323143206003357549362499695
+
+========================== No issues found in 22.73s ===========================
