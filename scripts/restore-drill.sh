@@ -34,10 +34,20 @@ python3 -m venv "$WORK/venv"
 "$WORK/venv/bin/pip" install -q -r requirements-docs.txt
 (source "$WORK/venv/bin/activate" && eval "$MKDOCS_CMD")
 step "7. запуск API на :$PORT і health-перевірка"
+# Порт має бути вільним: інакше health-перевірку пройде чужий процес (стара версія) — хибний PASS (знахідка 2026-11-22)
+if curl -s -m 2 -o /dev/null "localhost:$PORT/api/health"; then
+  echo "RESTORE DRILL: FAIL — порт $PORT уже зайнятий іншим процесом; зупиніть його або задайте SHOP_HTTP_PORT" >&2; exit 1
+fi
 SHOP_HTTP_PORT="$PORT" java -cp target/classes com.kira.shop.ShopApplication > "$WORK/api.log" 2>&1 &
 PID=$!
-for _ in $(seq 1 30); do curl -sf -m 2 "localhost:$PORT/api/health" | grep -q UP && break; sleep 1; done
-curl -sf -m 2 "localhost:$PORT/api/orders/ORD-1" >/dev/null
+healthy=0
+for _ in $(seq 1 30); do
+  kill -0 "$PID" 2>/dev/null || { echo "RESTORE DRILL: FAIL — відновлений API завершився (див. $WORK/api.log)" >&2; tail -5 "$WORK/api.log" >&2; exit 1; }
+  curl -sf -m 2 "localhost:$PORT/api/health" | grep -q UP && { healthy=1; break; }
+  sleep 1
+done
+[[ $healthy -eq 1 ]] || { kill "$PID" 2>/dev/null; echo "RESTORE DRILL: FAIL — health не UP за 30 с" >&2; exit 1; }
+curl -sf -m 2 "localhost:$PORT/api/orders/ORD-1" >/dev/null || { kill "$PID"; echo "RESTORE DRILL: FAIL — ORD-1 недоступне" >&2; exit 1; }
 kill "$PID"
 step "RESTORE DRILL: PASS — фактичний RTO $(( $(date +%s) - T0 )) с (ціль ISD: ≤ 900 с)"
 rm -rf "$WORK"

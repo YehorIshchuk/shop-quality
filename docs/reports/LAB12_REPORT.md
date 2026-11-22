@@ -25,7 +25,8 @@ tags: [process, ops]
 | `f966559` | `refactor(port): make PaymentResult a Java 17 record` | 3.2 — тригер інциденту |
 | `821c18f` (тег `lab12-incident-fail`) | `ops(incident): capture legacy module outage, FAIL` | 3.2 |
 | `1beae41` (тег `lab12-capa-pass`) | `docs(maintenance): deliver capa actions and swebok plan, PASS` | 3.3–3.5 |
-| наступний | `fix(ops): restore drill strict build without -q, drill #3 PASS` | 1 (знахідка валідації) |
+| `fda32db` | `fix(ops): restore drill strict build without -q, drill #3 PASS` | 1 (знахідка валідації) |
+| наступний | `fix(ops): restore drill refuses busy port and unhealthy restored API` | 1 (знахідка валідації) |
 
 ---
 
@@ -181,9 +182,10 @@ SLO і SLA не порушено.
 | 12 | Бюджет 8 хв = 0.4 % | `slo_budget.py --consumed pipeline-verdict=8` | ✅ |
 | 13 | Часи тріажу 19:11–19:15 в INC-001 | — | ⚠️ це хвилини симуляції (ручні кроки), не машинні мітки; машинні — з логів |
 | 15 | `restore-drill.sh` за замовчуванням збирає базу знань `mkdocs build --strict -q` | мутаційна перевірка: мертве посилання + `--strict -q` | ❌ **exit 0 — хибний PASS** (та сама пастка, що в ЛР11 п. 8) → без `-q`, drill #3 PASS |
+| 16 | «Restore drill PASS на MacBook» (скріншот 2) | `curl localhost:18090/api/health` після drill | ❌ відповів API з деплою, що лишився запущеним: drill не перевіряв, що порт вільний і health дав **свій** процес → перевірки додано, негативний тест FAIL / позитивний PASS (drill #4) |
 | 14 | Конвеєр на GitHub: зелений → червоний → зелений | Actions після push (скріншоти 3–5) | заповнює студент |
 
-**Висновок.** Дев'ять тверджень ШІ (1–7, 9, 11, 15) без перевірки дали б хибні документи. Найважливіше для ЛР12 — п. 7:
+**Висновок.** Десять тверджень ШІ (1–7, 9, 11, 15, 16) без перевірки дали б хибні документи. Найважливіше для ЛР12 — п. 7:
 ШІ ледь не зробив інцидент «брудним» (червоним із двох причин), що зруйнувало б RCA.
 
 ## Пов'язані документи

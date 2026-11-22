@@ -212,10 +212,12 @@ export BACKUP_PASSPHRASE='…'          # з Keychain
 | #1 | 2026-11-22 18:48 | ❌ FAIL на кроці 6: `No module named 'mermaid2'` | відновлення неявно залежало від інструментів старої машини (системний `mkdocs` без плагінів) → крок 6 переписано на чисте venv |
 | #2 | 2026-11-22 18:49 | ✅ PASS, RTO **20 с** | код, 16 тегів, 25 тестів, strict-збірка бази знань, API health — відновлено |
 | #3 | 2026-11-22 19:22 | ✅ PASS, RTO **20 с** | повтор після виправлення кроку 6: за замовчуванням `mkdocs build --strict` **без `-q`** (з `-q` strict-збірка з мертвим посиланням повертала 0 — хибний PASS); копія містить ЛР12 (теги `v1.1.0`, `lab12-*`) |
+| #4 | 2026-11-22 19:50 | ✅ негативна + позитивна перевірка | на MacBook drill пройшов, коли на тому ж порту ще працював API з деплою — health відповідав **чужий** процес. Скрипт тепер падає, якщо порт зайнятий, відновлений API завершився або health не UP за 30 с: зайнятий порт → `FAIL` exit 1, вільний → PASS, RTO 17 с |
 
 Логи: [drill #1](https://github.com/YehorIshchuk/shop-quality/blob/main/docs/reports/lab12/restore-drill-1-fail.log) ·
 [drill #2](https://github.com/YehorIshchuk/shop-quality/blob/main/docs/reports/lab12/restore-drill-2-pass.log) ·
-[drill #3](https://github.com/YehorIshchuk/shop-quality/blob/main/docs/reports/lab12/restore-drill-3-pass.log).
+[drill #3](https://github.com/YehorIshchuk/shop-quality/blob/main/docs/reports/lab12/restore-drill-3-pass.log) ·
+[drill #4](https://github.com/YehorIshchuk/shop-quality/blob/main/docs/reports/lab12/restore-drill-4-port-guard.log).
 
 ## 7. Експлуатаційні процедури
 

@@ -1,0 +1,12 @@
+# Перевірка захисту restore-drill.sh від зайнятого порту, 2026-11-22T19:51:10Z
+$ # порт 18080 зайнято старим API → drill має впасти
+19:50:17Z  +   1s     HEAD fda32db fix(ops): restore drill strict build without -q, drill #3 PASS  ·  тегів: 20
+19:50:34Z  +  18s  7. запуск API на :18080 і health-перевірка
+RESTORE DRILL: FAIL — порт 18080 уже зайнятий іншим процесом; зупиніть його або задайте SHOP_HTTP_PORT
+exit=1
+
+$ # порт вільний → drill має пройти
+19:50:36Z  +   1s     HEAD fda32db fix(ops): restore drill strict build without -q, drill #3 PASS  ·  тегів: 20
+19:50:51Z  +  16s  7. запуск API на :18080 і health-перевірка
+19:50:52Z  +  17s  RESTORE DRILL: PASS — фактичний RTO 17 с (ціль ISD: ≤ 900 с)
+exit=0
