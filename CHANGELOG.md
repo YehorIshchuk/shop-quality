@@ -5,6 +5,11 @@
 
 ## [Unreleased]
 
+### Виправлено
+
+- Сторінка API: «Try it out» працює через локальний `mkdocs serve`; з GitHub Pages Chrome блокує запити до `localhost`.
+- Звіт ЛР11 доповнено скріншотами конвеєра (FAIL → PASS), сайту, Swagger UI і графа Obsidian.
+
 ## [docs-v2.0] — 2026-11-22
 
 ### Додано

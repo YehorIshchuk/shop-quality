@@ -271,8 +271,12 @@ architecture/sdd.md: 19 зв'язків · isd.md: 16 · ADR-0001: 10 · ADR-000
 ```
 
 Перший прогін знайшов один «острів» — службову сторінку `tags.md`; її з'єднано з рівнями бази знань.
+На скріншоті центральний кущ зв'язний. Окремі точки по краях (`oo-metrics`, `ck-mood-report`, `01-baseline`…`04-restored-pass`)
+— це автоматично згенеровані звіти з папки `reports/` (ЛР8, ЛР10), а не сторінки бази знань `docs/`.
 
 > 📸 **СКРІНШОТ 1:** граф Obsidian (корінь репозиторію як Vault → Cmd+G), видно зв'язний кущ SDD / ISD / ADR.
+
+![Граф Obsidian](lab11/img/01-obsidian-graph.png)
 
 ---
 
@@ -511,8 +515,10 @@ components:
 
 ![Swagger UI у базі знань](lab11/img/site-api-swagger.png)
 
-> 📸 **СКРІНШОТ 2:** Swagger UI → `GET /api/orders/{orderId}` → *Try it out* → `ORD-1` → *Execute*: відповідь 200
-> з JSON замовлення (API запущено локально).
+> 📸 **СКРІНШОТ 2:** Swagger UI → `GET /api/orders` → *Try it out* → *Execute*: Server response **200**, тіло з `ORD-1`,
+> `content-type: application/json` (API і `mkdocs serve` запущено локально).
+
+![Swagger UI: Try it out, 200](lab11/img/02-swagger-try-it-out.png)
 
 **Генерація SDK:**
 
@@ -582,6 +588,10 @@ API-проєкт на Java → статичний довідник з doc-ком
 сторінка «Довідник коду і SDK» посилається на <https://yehorishchuk.github.io/shop-quality/javadoc/>.
 
 > 📸 **СКРІНШОТ 3:** розділ «3 · API» на задеплоєному сайті (GitHub Pages).
+
+![Розділ API на GitHub Pages](lab11/img/03a-site-api.png)
+
+![Swagger UI на GitHub Pages](lab11/img/03b-site-swagger.png)
 
 ---
 
@@ -748,6 +758,10 @@ Job `build` червоний, job `deploy` пропущено (`needs: [build, a
 > 📸 **СКРІНШОТ 4:** червоний run «docs» для коміту `docs(ci): inject broken reference into strict build, FAIL`
 > (крок `mkdocs build --strict`, текст помилки і *exit code 1*; deploy — *skipped*).
 
+![Run #2: build Failure, deploy skipped](lab11/img/04a-ci-fail-run.png)
+
+![Лог mkdocs build --strict: exit code 1](lab11/img/04b-ci-fail-log.png)
+
 ### 3.3 Протокол відновлення (PASS)
 
 Посилання замінено на існуючий регламент (`maintenance.md`, пункти 5–6). markdownlint: 0 issues;
@@ -756,7 +770,13 @@ Job `build` червоний, job `deploy` пропущено (`needs: [build, a
 
 > 📸 **СКРІНШОТ 5:** зелений run «docs» (build ✅ · api-contract ✅ · deploy ✅).
 >
+
+![Run #3: Success](lab11/img/05a-ci-pass-run.png)
+
+![Усі запуски конвеєра](lab11/img/05b-ci-runs.png)
 > 📸 **СКРІНШОТ 6:** задеплоєний сайт <https://yehorishchuk.github.io/shop-quality/> (видно адресу і дату редагування внизу сторінки).
+
+![Задеплоєний сайт](lab11/img/06-site-home.png)
 
 ### 3.4 Безперервний супровід
 
@@ -866,11 +886,12 @@ $ python3 tools/review_audit.py --today 2027-03-01
 | 9 | Граф знань зв'язний | підрахунок компонент зв'язності | ⚠️ острів `tags.md` → з'єднано; 1 компонента |
 | 10 | Тести після зміни API | JUnit (25/25) + ворота ЛР10 (`DOC CURRENCY GATE: PASS`) | ✅ |
 | 11 | Workflow синтаксично валідний | `actionlint` | ✅ |
-| 12 | Конвеєр червоніє / зеленіє на GitHub | запуски Actions для комітів FAIL і PASS (скріншоти 4–5) | ✅ — заповнює студент |
+| 12 | Конвеєр червоніє / зеленіє на GitHub | запуски Actions #1–#4 (скріншоти 4–5) | ✅ #2 — build Failure (exit 1), deploy skipped; #1, #3, #4 — Success, deploy |
+| 14 | «Try it out працює і з GitHub Pages» (сторінка API) | Execute на `yehorishchuk.github.io` | ❌ **Failed to fetch**: Chrome блокує запити публічного сайту до `localhost` (Local Network Access) → текст сторінки API виправлено: «Try it out» — через `mkdocs serve` |
 
 | 13 | Згадки синтаксису wikilinks у тексті звіту й `local-setup.md` | strict-збірка | ❌ `roamlinks` обробляє подвійні дужки навіть в інлайн-коді → формулювання змінено |
 
-**Висновок.** Сім кроків ШІ (1, 2, 3, 5, 6, 8, 13) без перевірки дали б хибний результат. Найважливіше — пункт 5:
+**Висновок.** Вісім кроків ШІ (1, 2, 3, 5, 6, 8, 13, 14) без перевірки дали б хибний результат. Найважливіше — пункт 5:
 «впевнено» написаний контракт розходився з кодом у 4 місцях. Це й доводить, навіщо потрібен принцип «довідка
 рендериться з контракту, а контракт перевіряється проти живого API».
 

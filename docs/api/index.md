@@ -23,8 +23,10 @@ tags: [api]
 ## Інтерактивна довідка (Swagger UI)
 
 Щоб «Try it out» працював, запустіть API локально (`java -cp target/classes com.kira.shop.ShopApplication`) —
-сервер у контракті `http://localhost:8080`. API віддає `Access-Control-Allow-Origin: *`, тож виклик працює
-зі сторінки `mkdocs serve` і з GitHub Pages (Chrome може попросити дозвіл на доступ до локальної мережі).
+сервер у контракті `http://localhost:8080` — і відкрийте цю сторінку з локального сайту `mkdocs serve`
+(<http://127.0.0.1:8000/shop-quality/api/>). API віддає `Access-Control-Allow-Origin: *`, тож запит між портами 8000 і 8080
+дозволено. З GitHub Pages «Try it out» до `localhost` не працює: Chrome блокує запити публічного сайту до локальної
+мережі (Local Network Access) — довідка там лише для читання.
 
 <swagger-ui src="openapi.yaml"/>
 
