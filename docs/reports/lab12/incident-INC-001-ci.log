@@ -1,0 +1,15 @@
+# INC-001 — відтворення конвеєра docs.yml на коміті-тригері f966559 (main), 2026-11-22
+19:09:26Z  job build        · markdownlint: Summary: 0 issues in 0 files
+19:09:27Z  job build        · review audit: Сторінок: 33 · актуальних: 31 · прострочених: 0 · deprecated: 2 · помилок паспорта: 0
+19:09:27Z  job build        · DOC CURRENCY GATE: PASS
+19:09:27Z  job build        · SLO SPEC CHECK: PASS
+19:09:27Z  job build        · mkdocs build --strict: Documentation built in 2.39 seconds
+19:09:30Z  job build        → SUCCESS
+19:09:37Z  job api-contract · spectral: No results with a severity of 'error' found!
+19:09:38Z  job api-contract · schemathesis: 173 generated, 173 passed
+19:09:47Z  job api-contract → SUCCESS (record компілюється і працює: PaymentResult використовується в оплаті ORD-1)
+19:09:47Z  job oo-gates     · pip install -r tools/requirements.txt  (javalang==0.13.0)
+19:09:47Z  job oo-gates     · $ ./scripts/oo-gate-god-object.sh ci
+ERROR: cannot parse src/main/java/com/kira/shop/application/port/PaymentResult.java near line 4. javalang supports Java syntax up to Java 8 (+ var); rewrite switch expressions / records / text blocks in this file.
+19:09:48Z  job oo-gates     → FAILURE, exit code 1   (крок Inheritance gate не виконувався)
+19:09:48Z  job deploy       → SKIPPED (needs: build, api-contract, oo-gates) — сайт лишається на попередній версії

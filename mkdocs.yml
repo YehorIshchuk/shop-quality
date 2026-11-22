@@ -68,6 +68,9 @@ nav:
           - changes/CCB-001.md
           - changes/release-checklist.md
       - legacy/oo-metrics.md
+      - "Інциденти":
+          - incidents/INC-001.md
+          - incidents/PM-001.md
       - maintenance-plan.md
   - "Історія змін": changelog.md
   - "Архів процесу":
