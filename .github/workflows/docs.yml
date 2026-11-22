@@ -1,0 +1,137 @@
+# Конвеєр документації Shop Quality (ЛР11, Завдання 3): «не збирається — не їде».
+# Будь-який дефект документації (мертве посилання, сторінка поза nav, зламана розмітка,
+# неякісний контракт, дрейф API від контракту, неповний паспорт) завершує job з Exit Code 1,
+# а deploy на GitHub Pages виконується лише після зеленого build і api-contract.
+name: docs
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:                       # одна публікація за раз; новий push скасовує застарілу збірку
+  group: docs-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: build (markdownlint → strict build)
+    runs-on: ubuntu-latest
+    steps:
+      # 1. Checkout з повною історією: git-revision-date-localized бере дату останнього коміту кожної сторінки
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      # 2. Python для MkDocs і скриптів аудиту
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements-docs.txt
+
+      # 3. mkdocs-material з плагінами (версії зафіксовано в requirements-docs.txt)
+      - name: Install MkDocs Material and plugins
+        run: pip install -r requirements-docs.txt
+
+      # 4. Стиль Markdown — правила .markdownlint.yaml
+      - name: markdownlint
+        uses: DavidAnson/markdownlint-cli2-action@v25
+        with:
+          globs: |
+            README.md
+            CHANGELOG.md
+            docs/**/*.md
+
+      # 5. Паспорти документів: owner / status / review_date; прострочені review_date — у Summary і анотаціях
+      - name: Review-date audit (front matter)
+        run: python3 tools/review_audit.py
+
+      # 6. Правило ЛР10 «зміна коду = зміна документації»
+      - name: Doc currency gate (LR10)
+        run: python3 tools/doc_audit.py --gate
+
+      # 7. Strict-збірка: будь-який WARNING (мертве посилання, orphan-сторінка, битий якір) → Exit Code 1
+      - name: mkdocs build --strict
+        run: mkdocs build --strict
+
+      # 8. Javadoc — статичний довідник з doc-коментарів коду (варіативний пункт), публікується як /javadoc/
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "17"
+      - name: Javadoc into site/javadoc
+        run: >-
+          javadoc -d site/javadoc -sourcepath src/main/java -subpackages com.kira.shop
+          -encoding UTF-8 -docencoding UTF-8 -charset UTF-8 -Xdoclint:none -quiet
+          -windowtitle "Shop Quality — Javadoc" -doctitle "Shop Quality — Javadoc"
+
+      - name: Upload site artifact
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: site
+
+  api-contract:
+    name: api-contract (Spectral → Schemathesis → SDK)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+
+      # Якість контракту: правила .spectral.yaml, поріг — 0 errors
+      - name: Spectral lint
+        run: npx --yes @stoplight/spectral-cli@6 lint docs/api/openapi.yaml --fail-severity=error
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      # Контрактний дрейф: Schemathesis проти живого API, зібраного з цього ж коміту
+      - name: Build and start the API
+        run: |
+          mvn -B -q -DskipTests package
+          nohup java -cp target/classes com.kira.shop.ShopApplication > api.log 2>&1 &
+          for i in $(seq 1 30); do curl -sf localhost:8080/api/health && break; sleep 1; done
+      # Версії зафіксовано: ті самі, якими контракт перевірено локально (відтворюваний результат)
+      - name: Install contract tooling
+        run: pip install schemathesis==4.33.4 openapi-generator-cli==7.27.0
+      - name: Schemathesis contract test
+        run: schemathesis run docs/api/openapi.yaml --url http://localhost:8080 --checks all --max-examples 60
+
+      # Клієнтський SDK з контракту: генерація + компіляція доводять, що контракт придатний для інтеграції
+      - name: Generate and compile Java SDK
+        run: |
+          openapi-generator-cli generate -i docs/api/openapi.yaml -g java --library native \
+            -o sdk-client --additional-properties=groupId=com.kira.shop,artifactId=shop-orders-client,artifactVersion=1.0.0,invokerPackage=com.kira.shop.client,apiPackage=com.kira.shop.client.api,modelPackage=com.kira.shop.client.model,hideGenerationTimestamp=true
+          mvn -B -q -f sdk-client/pom.xml -Dmaven.test.skip=true package
+      - uses: actions/upload-artifact@v7
+        with:
+          name: sdk-client
+          path: sdk-client/target/*.jar
+
+  deploy:
+    name: deploy (GitHub Pages)
+    needs: [build, api-contract]           # червоний build або api-contract → сайт не оновлюється
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5

@@ -101,9 +101,13 @@ flowchart TB
 
 <a id="d3"></a>
 
-### D3 · CI/CD-конвеєр (локальний)
+### D3 · CI/CD-конвеєри
 
-Хмарного CI немає. Конвеєр — Bash-скрипти, які запускаються вручну перед `git push` і на кожному стані-тегу.
+**Код** — локальні Bash-скрипти, які запускаються вручну перед `git push` і на кожному стані-тегу (схема нижче).
+**Документація** — хмарний конвеєр GitHub Actions `.github/workflows/docs.yml` на кожен push і pull request у `main`
+(ЛР11): job `build` (markdownlint → review-date audit → doc currency gate → `mkdocs build --strict` → Javadoc),
+job `api-contract` (Spectral → Schemathesis проти живого API → генерація і компіляція SDK) і `deploy` на
+GitHub Pages лише після обох зелених job. Сайт: <https://yehorishchuk.github.io/shop-quality/>.
 
 ```mermaid
 flowchart LR
@@ -119,7 +123,8 @@ flowchart LR
 | build + test + coverage | `mvn -B clean verify` | кожен коміт (вручну) | усі тести зелені |
 | SAST | `scripts/scan.sh` (`sonar:sonar`, `sonar.qualitygate.wait=true`) | перед push, на кожному тезі | «Shop-Quality-Gate»: new bugs = 0, new hotspots reviewed = 100 %, duplicated lines ≤ 3 %, Maintainability = A |
 | OO-гейти (ЛР8) | `scripts/oo-gate-god-object.sh check`, `scripts/oo-gate-inheritance.sh check` | зміни в `application/`, `report/` | CBO ≤ 8, LCOM ≤ 0.2, DIT ≤ 1, NMO = 0 |
-| Doc-гейт (ЛР10) | `python3 tools/doc_audit.py --gate` | кожна зміна коду (правило [maintenance.md](../developer/maintenance.md)) | `DOC CURRENCY GATE: PASS` |
+| Doc-гейт (ЛР10) | `python3 tools/doc_audit.py --gate` | кожен push / PR (GitHub Actions `docs.yml`) | `DOC CURRENCY GATE: PASS` |
+| Конвеєр документації (ЛР11) | `.github/workflows/docs.yml` | кожен push / PR у `main` | markdownlint 0 errors · strict build Exit 0 · Spectral 0 errors · Schemathesis 0 failures → deploy Pages |
 | реліз | `git tag -a <name> && git push --follow-tags` | стан лабораторної | усі гейти PASS |
 
 <a id="d4"></a>

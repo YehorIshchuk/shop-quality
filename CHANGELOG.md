@@ -11,6 +11,8 @@
 - Front matter-паспорти (`owner`, `status`, `review_date`, `tags`) у кожному документі, `.github/CODEOWNERS`.
 - OpenAPI-контракт `docs/api/openapi.yaml` (API 1.0.0), правила Spectral, довідка Swagger UI, клієнтський SDK, Javadoc.
 - HTTP API: заголовок `Access-Control-Allow-Origin: *` для Swagger UI «Try it out».
+- Конвеєр GitHub Actions `docs.yml`: markdownlint, review-date audit, doc currency gate, `mkdocs build --strict`,
+  Spectral, Schemathesis, SDK, Javadoc і публікація на GitHub Pages; чек-лист docs-or-don't-merge у CONTRIBUTING.
 
 ### Виправлено
 

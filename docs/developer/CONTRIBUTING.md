@@ -37,6 +37,25 @@ tags: [architecture]            # architecture | api | ops | developer | process
 - Архітектурне рішення = новий ADR, старий не редагується по суті ([[0001-hexagonal-ports-and-adapters|канон ADR]]).
 - Перед push: `mkdocs build --strict` — нуль попереджень.
 
+## Definition of Done: docs-or-don't-merge
+
+Pull request, що **змінює публічну поведінку** — новий або змінений ендпоінт, формат відповіді, конфігурація,
+змінна середовища, порядок запуску — **не зливається**, доки не виконано всі пункти:
+
+- [ ] `docs/` оновлено: README (рівень 1), SDD / ISD (рівень 4) або нове ADR — за таблицею тригерів [[maintenance]]
+- [ ] `docs/api/openapi.yaml` оновлено, `info.version` піднято за SemVer (patch — виправлення, minor — новий ендпоінт, major — несумісна зміна)
+- [ ] `CHANGELOG.md` має запис у розділі `[Unreleased]`
+- [ ] у front matter змінених сторінок оновлено `review_date`; застаріла сторінка → `status: deprecated` + `superseded_by`
+- [ ] конвеєр `docs.yml` зелений: markdownlint · review-date audit · doc currency gate · `mkdocs build --strict` · Spectral · Schemathesis
+
+Автоматичні перевірки (таблиця DoD у README) блокують злиття самі; рев'ю власника з `.github/CODEOWNERS`
+підтверджує, що документація описує зміну по суті, а не лише проходить лінтери.
+
+## Версії документації
+
+Мажорна зміна документації фіксується тегом `docs-vX.Y` на коміті релізу: знімок документації відновлюється з тегу
+так само, як код релізу (`git checkout docs-v1.0 && mkdocs serve`). Історія тегів — у [Історії змін](../changelog.md).
+
 ## Пов'язані документи
 
 [[local-setup]] · [[coding-standards]] · [[maintenance]] · [[handover]]
