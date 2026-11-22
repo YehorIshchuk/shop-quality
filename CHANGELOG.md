@@ -10,6 +10,8 @@
 - Експлуатаційний пакет SRE (ЛР12): runbook RB-001 і `scripts/deploy-api.sh` (розгортання/відкат), каталог алертів,
   `docs/slo.yaml` з трьома SLI і перевіркою бюджетів (`tools/slo_budget.py`), SLI-проба `tools/sli_probe.py`,
   політика бекапу 3-2-1 (`scripts/backup.sh`) і restore drill (`scripts/restore-drill.sh`).
+- Управління змінами: RFC-001, протокол CCB-001, шаблон заявки `.github/ISSUE_TEMPLATE/rfc.yml`.
+- Конвеєр `docs.yml`: job `oo-gates` — OO-гейти ЛР8 (CBO / LCOM / DIT / NMO) на кожен push і PR, OO-звіт як artifact (RFC-001).
 
 ### Виправлено
 

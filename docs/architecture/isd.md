@@ -111,8 +111,8 @@ flowchart TB
 **Код** — локальні Bash-скрипти, які запускаються вручну перед `git push` і на кожному стані-тегу (схема нижче).
 **Документація** — хмарний конвеєр GitHub Actions `.github/workflows/docs.yml` на кожен push і pull request у `main`
 (ЛР11): job `build` (markdownlint → review-date audit → doc currency gate → `mkdocs build --strict` → Javadoc),
-job `api-contract` (Spectral → Schemathesis проти живого API → генерація і компіляція SDK) і `deploy` на
-GitHub Pages лише після обох зелених job. Сайт: <https://yehorishchuk.github.io/shop-quality/>.
+job `api-contract` (Spectral → Schemathesis проти живого API → генерація і компіляція SDK), job `oo-gates`
+(OO-гейти ЛР8, з ЛР12 за [RFC-001](../changes/RFC-001.md)) і `deploy` на GitHub Pages лише після трьох зелених job. Сайт: <https://yehorishchuk.github.io/shop-quality/>.
 
 ```mermaid
 flowchart LR
@@ -127,9 +127,9 @@ flowchart LR
 |---|---|---|---|
 | build + test + coverage | `mvn -B clean verify` | кожен коміт (вручну) | усі тести зелені |
 | SAST | `scripts/scan.sh` (`sonar:sonar`, `sonar.qualitygate.wait=true`) | перед push, на кожному тезі | «Shop-Quality-Gate»: new bugs = 0, new hotspots reviewed = 100 %, duplicated lines ≤ 3 %, Maintainability = A |
-| OO-гейти (ЛР8) | `scripts/oo-gate-god-object.sh check`, `scripts/oo-gate-inheritance.sh check` | зміни в `application/`, `report/` | CBO ≤ 8, LCOM ≤ 0.2, DIT ≤ 1, NMO = 0 |
+| OO-гейти (ЛР8) | `scripts/oo-gate-god-object.sh`, `scripts/oo-gate-inheritance.sh` | кожен push / PR — job `oo-gates` у `docs.yml` (RFC-001); локально — перед push | CBO ≤ 8, LCOM ≤ 0.2, DIT ≤ 1, NMO = 0; OO-звіт — artifact `oo-report` |
 | Doc-гейт (ЛР10) | `python3 tools/doc_audit.py --gate` | кожен push / PR (GitHub Actions `docs.yml`) | `DOC CURRENCY GATE: PASS` |
-| Конвеєр документації (ЛР11) | `.github/workflows/docs.yml` | кожен push / PR у `main` | markdownlint 0 errors · strict build Exit 0 · Spectral 0 errors · Schemathesis 0 failures → deploy Pages |
+| Конвеєр документації (ЛР11) | `.github/workflows/docs.yml` | кожен push / PR у `main` | markdownlint 0 errors · strict build Exit 0 · Spectral 0 errors · Schemathesis 0 failures · OO GATE PASS → deploy Pages |
 | реліз | `git tag -a <name> && git push --follow-tags` | стан лабораторної | усі гейти PASS |
 
 <a id="d4"></a>

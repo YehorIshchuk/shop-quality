@@ -46,6 +46,7 @@ curl -s localhost:8080/api/orders                      # замовлення у
 |---|---|---|
 | Контракт API | Spectral (`.spectral.yaml`) | 0 errors |
 | Відповідність контракту живому коду | Schemathesis проти запущеного API | 0 failures |
+| Архітектурні пороги ЛР8 | `scripts/oo-gate-*.sh` (job `oo-gates`, RFC-001) | OO GATE: PASS (CBO ≤ 8, LCOM ≤ 0.2, DIT ≤ 1, NMO = 0) |
 | Розмітка Markdown | markdownlint (`.markdownlint.yaml`) | 0 errors |
 | Посилання, навігація, синтаксис | `mkdocs build --strict` | Exit Code 0 |
 | Актуальність | `review_date` із front matter (`tools/review_audit.py`) | прострочені сторінки — у звіті конвеєра |

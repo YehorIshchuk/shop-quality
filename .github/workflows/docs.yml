@@ -1,7 +1,7 @@
 # Конвеєр документації Shop Quality (ЛР11, Завдання 3): «не збирається — не їде».
 # Будь-який дефект документації (мертве посилання, сторінка поза nav, зламана розмітка,
 # неякісний контракт, дрейф API від контракту, неповний паспорт) завершує job з Exit Code 1,
-# а deploy на GitHub Pages виконується лише після зеленого build і api-contract.
+# а deploy на GitHub Pages виконується лише після зелених build, api-contract і oo-gates (RFC-001).
 name: docs
 
 on:
@@ -125,9 +125,36 @@ jobs:
           name: sdk-client
           path: sdk-client/target/*.jar
 
+  oo-gates:
+    name: oo-gates (CBO / LCOM / DIT — ЛР8, RFC-001)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: tools/requirements.txt
+      # javalang зафіксовано в tools/requirements.txt; розбирає синтаксис Java до 8 (ризик R1 у RFC-001)
+      - name: Install OO audit tool
+        run: pip install -r tools/requirements.txt
+      # God Object: 11 сервісів після декомпозиції ЛР8 мають CBO ≤ 8 і LCOM ≤ 0.2
+      - name: God Object gate
+        run: ./scripts/oo-gate-god-object.sh ci
+      # Inheritance Hell: класи звітів мають DIT ≤ 1 і NMO = 0
+      - name: Inheritance gate
+        run: ./scripts/oo-gate-inheritance.sh ci
+      - name: Upload OO report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: oo-report
+          path: reports/oo/ci/
+          retention-days: 14
+
   deploy:
     name: deploy (GitHub Pages)
-    needs: [build, api-contract]           # червоний build або api-contract → сайт не оновлюється
+    needs: [build, api-contract, oo-gates] # червоний build, api-contract або oo-gates → сайт не оновлюється
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:

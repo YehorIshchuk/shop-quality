@@ -46,7 +46,7 @@ Pull request, що **змінює публічну поведінку** — но
 - [ ] `docs/api/openapi.yaml` оновлено, `info.version` піднято за SemVer (patch — виправлення, minor — новий ендпоінт, major — несумісна зміна)
 - [ ] `CHANGELOG.md` має запис у розділі `[Unreleased]`
 - [ ] у front matter змінених сторінок оновлено `review_date`; застаріла сторінка → `status: deprecated` + `superseded_by`
-- [ ] конвеєр `docs.yml` зелений: markdownlint · review-date audit · doc currency gate · `mkdocs build --strict` · Spectral · Schemathesis
+- [ ] конвеєр `docs.yml` зелений: markdownlint · review-date audit · doc currency gate · `mkdocs build --strict` · Spectral · Schemathesis · OO-гейти
 
 Автоматичні перевірки (таблиця DoD у README) блокують злиття самі; рев'ю власника з `.github/CODEOWNERS`
 підтверджує, що документація описує зміну по суті, а не лише проходить лінтери.
