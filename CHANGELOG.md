@@ -5,6 +5,10 @@
 
 ## [Unreleased]
 
+## [v1.1.0] — 2026-11-22
+
+Перший реліз за RFC-процесом ([RFC-001](docs/changes/RFC-001.md), Release Checklist — `docs/changes/release-checklist.md`).
+
 ### Додано
 
 - Експлуатаційний пакет SRE (ЛР12): runbook RB-001 і `scripts/deploy-api.sh` (розгортання/відкат), каталог алертів,

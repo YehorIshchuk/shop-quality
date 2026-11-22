@@ -1,0 +1,33 @@
+# Staging-перевірка релізу v1.1.0 (кандидат v1.1.0-rc.1 = b76df67)  ·  2026-11-22T18:56:06Z
+$ ./scripts/deploy-api.sh v1.1.0-rc.1      # staging: DEPLOY_DIR=/tmp/shop-staging, порт 18091
+2026-11-22T18:56:06Z  збираю v1.1.0-rc.1 у /tmp/shop-staging/releases/v1.1.0-rc.1
+2026-11-22T18:56:08Z  запускаю v1.1.0-rc.1 на :18091
+2026-11-22T18:56:09Z  HEALTH OK за 2 с — розгорнуто v1.1.0-rc.1 (попередня: немає)
+$ ./scripts/deploy-api.sh status
+current:  v1.1.0-rc.1
+previous: —
+health:   UP (http://localhost:18091/api/health)
+$ python3 tools/sli_probe.py --url http://localhost:18091 --requests 1000 --check
+    "availability": 100.0,
+    "p95": 13.25,
+ALERT CONDITIONS: OK
+$ schemathesis run docs/api/openapi.yaml --url http://localhost:18091 --checks all --max-examples 30
+  246 generated, 246 passed
+========================== No issues found in 12.64s ===========================
+$ markdownlint-cli2 README.md CHANGELOG.md "docs/**/*.md"
+Summary: 0 issues in 0 files
+$ python3 tools/review_audit.py | sed -n 3p
+Сторінок: 32 · актуальних: 30 · прострочених: 0 · deprecated: 2 · помилок паспорта: 0
+$ python3 tools/doc_audit.py --gate | tail -1
+DOC CURRENCY GATE: PASS
+$ python3 tools/slo_budget.py --check | tail -1
+SLO SPEC CHECK: PASS
+$ mkdocs build --strict
+INFO    -  Documentation built in 2.37 seconds
+$ spectral lint docs/api/openapi.yaml --fail-severity=error
+No results with a severity of 'error' found!
+$ ./scripts/oo-gate-god-object.sh ci | tail -1 && ./scripts/oo-gate-inheritance.sh ci | tail -1
+OO GATE: PASS
+OO GATE: PASS
+$ JUnit (javac-шим; mvn verify — на станції розробника)
+Tests passed: 25, failed: 0
