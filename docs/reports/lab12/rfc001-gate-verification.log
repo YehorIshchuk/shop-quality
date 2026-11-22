@@ -1,0 +1,26 @@
+$ ./scripts/oo-gate-god-object.sh rfc001     # main, пороги ЛР8 (CBO ≤ 8, LCOM ≤ 0.2)
+written: reports/oo/rfc001/oo-metrics.json, oo-metrics.md, coupling-matrix.html|csv, dependency-graph.mmd
+  PASS OrderPlacementService: CBO=8 LCOM=0.0 LCOM4=1 DIT=1 NMO=0
+  PASS OrderPaymentService: CBO=7 LCOM=0.0 LCOM4=1 DIT=1 NMO=0
+  PASS OrderShippingService: CBO=3 LCOM=0.0 LCOM4=1 DIT=1 NMO=0
+  PASS OrderCancellationService: CBO=6 LCOM=0.0 LCOM4=1 DIT=1 NMO=0
+  PASS CatalogService: CBO=3 LCOM=0.0 LCOM4=1 DIT=1 NMO=0
+  PASS PromotionService: CBO=5 LCOM=0.0 LCOM4=1 DIT=1 NMO=0
+  PASS CustomerInsightsService: CBO=7 LCOM=0.0 LCOM4=1 DIT=1 NMO=0
+  PASS SalesReportingService: CBO=5 LCOM=0.0 LCOM4=1 DIT=1 NMO=0
+  PASS PricingService: CBO=5 LCOM=0.0 LCOM4=2 DIT=1 NMO=0
+  PASS StockAllocator: CBO=7 LCOM=0.0 LCOM4=1 DIT=1 NMO=0
+  PASS SalesLedger: CBO=3 LCOM=0.0 LCOM4=1 DIT=1 NMO=0
+OO GATE: PASS
+exit code: 0
+
+$ ./scripts/oo-gate-inheritance.sh rfc001
+  PASS ReportTable: CBO=0 LCOM=0.5 LCOM4=1 DIT=1 NMO=0
+  PASS SalesReport: CBO=4 LCOM=0.562 LCOM4=1 DIT=1 NMO=0
+  PASS MonthlySalesReport: CBO=4 LCOM=0.3 LCOM4=2 DIT=1 NMO=0
+OO GATE: PASS
+
+$ ./scripts/oo-audit.sh rfc001-negative --max-cbo 7 --max-lcom 0.2 --gate OrderPlacementService   # негативний тест: поріг нижчий за фактичний CBO=8
+  FAIL OrderPlacementService: CBO=8 LCOM=0.0 LCOM4=1 DIT=1 NMO=0  <- CBO 8 > 7
+OO GATE: FAIL
+exit code: 1

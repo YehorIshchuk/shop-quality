@@ -1,0 +1,37 @@
+name: RFC — заявка на зміну
+description: Request for Change за регламентом CCB (docs/changes/CCB-001.md)
+title: "RFC-XXX: "
+labels: ["rfc:draft"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Стани заявки — мітки: `rfc:draft` → `rfc:assessment` → `rfc:pending-ccb` → `rfc:approved` / `rfc:rejected` → `rfc:implemented` → `rfc:closed`.
+        Повний документ заявки — `docs/changes/RFC-XXX.md` (зразок: RFC-001).
+  - type: textarea
+    id: description
+    attributes: {label: Опис і мета зміни}
+    validations: {required: true}
+  - type: textarea
+    id: rationale
+    attributes: {label: Обґрунтування (цінність для бізнесу / архітектури)}
+    validations: {required: true}
+  - type: dropdown
+    id: itil
+    attributes:
+      label: Клас зміни (ITIL)
+      options: [Стандартна, Нормальна, Термінова]
+    validations: {required: true}
+  - type: dropdown
+    id: risk
+    attributes:
+      label: Клас ризику (Risk Exposure)
+      options: ["Низький (1–5)", "Середній (6–12)", "Високий (15–25)"]
+    validations: {required: true}
+  - type: input
+    id: window
+    attributes: {label: Запропоноване вікно розгортання (UTC)}
+  - type: textarea
+    id: rollback
+    attributes: {label: План відкату}
+    validations: {required: true}
