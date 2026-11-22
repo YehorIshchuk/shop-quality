@@ -18,6 +18,8 @@
 
 > 📸 **СКРІНШОТ 1:** `git log --oneline --graph -8` у терміналі (видно всі коміти й теги ЛР10).
 
+![Скріншот 1](lab10/img/01-git-log.png)
+
 ---
 
 ## Завдання 1. Інвентаризаційний аудит документації
@@ -294,6 +296,10 @@ $ curl -o /dev/null -w "%{http_code}" localhost:18080/api/orders/ORD-9
 
 > 📸 **СКРІНШОТ 2:** запущений застосунок + `curl localhost:8080/api/orders` в іншому терміналі.
 
+![Скріншот 2](lab10/img/02a-api-server.png)
+
+![Скріншот 2](lab10/img/02b-api-curl.png)
+
 **Доказ дрейфу для кожної аудиторії** (документи у стані `lab10-decay-fail`):
 
 | Аудиторія | Що каже документ | Що насправді | Дрейф |
@@ -321,6 +327,8 @@ DOC CURRENCY GATE: FAIL   (exit code 1)
 > 📸 **СКРІНШОТ 3:** `git checkout lab10-decay-fail && python3 tools/doc_audit.py --gate; echo $?` → FAIL, `1`.
 > На тезі лежить версія скрипта до виправлення хибно-позитивної перевірки `api/`, тому вона показує **6/22** провалів;
 > збережений звіт `reports/docs/03-decay-fail.md` знято виправленим скриптом, тому там **7/22**. Вердикт однаковий: FAIL.
+
+![Скріншот 3](lab10/img/03-doc-gate-fail.png)
 
 ### 3.3 Протокол відновлення (PASS)
 
@@ -354,6 +362,8 @@ DOC CURRENCY GATE: FAIL   (exit code 1)
 пакетів тепер шукає назву саме в бектиках.
 
 > 📸 **СКРІНШОТ 4:** `git checkout main && python3 tools/doc_audit.py --gate; echo $?` → PASS, `0`.
+
+![Скріншот 4](lab10/img/04-doc-gate-pass.png)
 
 ### 3.4 Handover-пакет — `docs/handover.md`
 

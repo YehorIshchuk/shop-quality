@@ -9,3 +9,5 @@ reports/sonar-raw/*.json
 reports/oo/check/
 reports/oo/current/
 reports/current/
+.DS_Store
+.obsidian/
