@@ -1,0 +1,11 @@
+# CAPA effectiveness check: replay of the INC-001 trigger (PaymentResult = record) with CAPA-1/2 applied — 2026-11-22T19:12:31Z
+$ python3 tools/java_syntax_guard.py
+  src/main/java/com/kira/shop/application/port/PaymentResult.java:4  [record] record declaration (Java 16) -> use a final class with private final fields and accessors
+JAVA SYNTAX GUARD: FAIL — 1 construct(s) in 1 file(s) are not supported by javalang 0.13.0 (OO gates, ADR-0004, coding-standards §4)
+exit=1
+
+$ ./scripts/oo-gate-god-object.sh ci     # without the guard step: tool error must be exit 3, not 1
+OO TOOL ERROR: javalang 0.13.0 cannot parse these files (supports Java syntax up to 8, see ADR-0004):
+  src/main/java/com/kira/shop/application/port/PaymentResult.java:4  JavaSyntaxError
+No verdict was produced (exit 3 = tool error, NOT a threshold violation). Run tools/java_syntax_guard.py for details; runbook RB-002.
+exit=3

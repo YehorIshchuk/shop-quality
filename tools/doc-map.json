@@ -28,7 +28,13 @@
     "CHANGELOG.md",
     "docs/slo.yaml",
     "docs/runbooks/RB-001.md",
-    "docs/runbooks/alerts.md"
+    "docs/runbooks/alerts.md",
+    "docs/legacy/oo-metrics.md",
+    "docs/architecture/adr/0004-javalang-java8-syntax-limit.md",
+    "docs/runbooks/RB-002.md",
+    "docs/incidents/INC-001.md",
+    "docs/incidents/PM-001.md",
+    "docs/maintenance-plan.md"
   ],
   "components": [
     {

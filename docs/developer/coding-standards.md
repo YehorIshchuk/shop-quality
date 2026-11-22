@@ -44,7 +44,9 @@ tags: [developer]
 
 - Гроші — `BigDecimal`, округлення `HALF_UP` до 0.01 через `MoneyUtils`; ніяких `double` для сум.
 - Класи-утиліти і листові класи — `final`, приватний конструктор у утиліт.
-- Не використовувати `switch`-вирази, `record` і text blocks: `tools/oo_metrics.py` (javalang) розбирає синтаксис лише до Java 8.
+- Синтаксис Java ≤ 8 (+ `var`): без `record`, `switch`-правил `case ->`/`yield`, text blocks, `sealed`, pattern matching
+  `instanceof` — рішення [ADR-0004](../architecture/adr/0004-javalang-java8-syntax-limit.md). Перевіряє
+  `python3 tools/java_syntax_guard.py` (CI, `scripts/oo-audit.sh`); виняток — лише через RFC.
 - Кожен use case покривається тестом у `src/test/java` (JUnit 5); тести без мережі, порт HTTP — `0`.
 
 ## 5. Коміти

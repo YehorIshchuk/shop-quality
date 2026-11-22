@@ -8,3 +8,7 @@
 /mkdocs.yml                 @YehorIshchuk
 /requirements-docs.txt      @YehorIshchuk
 /.github/                   @YehorIshchuk
+# CAPA-2 (INC-001): інструменти конвеєра і код теж мають власника — зміни tools/, scripts/, src/ проходять review
+/tools/                     @YehorIshchuk
+/scripts/                   @YehorIshchuk
+/src/                       @YehorIshchuk

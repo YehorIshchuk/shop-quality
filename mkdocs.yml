@@ -58,10 +58,12 @@ nav:
           - architecture/adr/0001-hexagonal-ports-and-adapters.md
           - architecture/adr/0002-in-memory-storage-with-csv-export.md
           - architecture/adr/0003-embedded-jdk-http-server.md
+          - architecture/adr/0004-javalang-java8-syntax-limit.md
       - architecture/blueprint-lab8.md
   - "5 · Експлуатація і супровід":
       - slo.md
       - runbooks/RB-001.md
+      - runbooks/RB-002.md
       - runbooks/alerts.md
       - "Управління змінами":
           - changes/RFC-001.md
@@ -79,6 +81,7 @@ nav:
       - reports/LAB8_REPORT.md
       - reports/LAB10_REPORT.md
       - reports/LAB11_REPORT.md
+      - reports/LAB12_REPORT.md
       - reports/DEMO.md
   - "Теги": tags.md
 

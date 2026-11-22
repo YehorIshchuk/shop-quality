@@ -15,3 +15,7 @@ site/
 .venv/
 sdk-client/
 reports/oo/ci/
+
+# Python bytecode (tools/tests)
+__pycache__/
+*.pyc

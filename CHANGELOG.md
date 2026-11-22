@@ -5,9 +5,23 @@
 
 ## [Unreleased]
 
+### Додано
+
+- `tools/java_syntax_guard.py` — перевірка синтаксису Java, непідтримуваного OO-гейтами (CAPA-2), крок у CI і `oo-audit.sh`.
+- Модульні тести legacy-модуля `tools/tests/` (fixtures Java 8 / record / Java 17), крок у job `oo-gates`.
+- [ADR-0004](docs/architecture/adr/0004-javalang-java8-syntax-limit.md), runbook RB-002, алерт A-05 `OOGateToolError`,
+  щотижневий плановий запуск конвеєра; інцидент [INC-001](docs/incidents/INC-001.md) і [PM-001](docs/incidents/PM-001.md);
+  [план супроводу](docs/maintenance-plan.md).
+
 ### Змінено
 
-- `PaymentResult` — Java 17 `record` замість класу з ручними полями (менше шаблонного коду, API порту без змін).
+- `tools/oo_metrics.py`: нерозбірний файл → код виходу **3** «OO TOOL ERROR» з переліком усіх файлів замість
+  `sys.exit` з кодом 1 (той самий, що й порушення порога) (CAPA-1).
+- Регламент CCB: залишковий ризик приймається лише з власником і терміном; CODEOWNERS покриває `/tools/`, `/scripts/`, `/src/`.
+
+### Виправлено
+
+- INC-001: `PaymentResult` повернуто до `final`-класу — Java `record` ламав розбір у `oo_metrics.py` (javalang ≤ Java 8).
 
 ## [v1.1.0] — 2026-11-22
 

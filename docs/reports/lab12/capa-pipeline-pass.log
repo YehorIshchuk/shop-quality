@@ -1,0 +1,18 @@
+# Конвеєр docs.yml після CAPA-1/2/3 (робоче дерево коміту PASS), 2026-11-22
+19:17:21Z  job build        · markdownlint: Summary: 0 issues in 0 files
+19:17:22Z  job build        · review audit: Сторінок: 37 · актуальних: 35 · прострочених: 0 · deprecated: 2 · помилок паспорта: 0
+19:17:22Z  job build        · SLO SPEC CHECK: PASS
+19:17:22Z  job build        · mkdocs build --strict: Documentation built in 2.69 seconds
+19:17:26Z  job build        · actionlint: OK
+19:17:26Z  job build        → SUCCESS   (doc currency gate — після коміту, див. нижче)
+19:17:26Z  job api-contract · JUnit: Tests passed: 25, failed: 0
+19:17:33Z  job api-contract · spectral: No results with a severity of 'error' found!
+19:17:34Z  job api-contract · schemathesis: 183 generated, 183 passed
+19:17:43Z  job api-contract · sli_probe --check (600 запитів): ALERT CONDITIONS: OK
+19:17:43Z  job api-contract → SUCCESS
+19:17:43Z  job oo-gates     · unit tests: Ran 10 tests in 0.016s OK
+19:17:44Z  job oo-gates     · JAVA SYNTAX GUARD: PASS — no Java 9+ constructs unsupported by the OO gates in src/main/java, src/test/java
+19:17:44Z  job oo-gates     · god-object gate: OO GATE: PASS (exit 0)
+19:17:44Z  job oo-gates     · inheritance gate: OO GATE: PASS (exit 0)
+19:17:44Z  job oo-gates     → SUCCESS
+19:17:44Z  job deploy       → виконується (needs задоволено) — сайт оновлено. ВІДНОВЛЕННЯ

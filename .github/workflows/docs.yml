@@ -10,6 +10,8 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
+  schedule:                        # CAPA-3 (INC-001): щотижневий прогін без змін коду виявляє дрейф інструментів
+    - cron: "17 6 * * 1"           # понеділок 06:17 UTC — до засідання CCB о 10:00
 
 permissions:
   contents: read
@@ -135,15 +137,28 @@ jobs:
           python-version: "3.12"
           cache: pip
           cache-dependency-path: tools/requirements.txt
-      # javalang зафіксовано в tools/requirements.txt; розбирає синтаксис Java до 8 (ризик R1 у RFC-001)
+      # javalang зафіксовано в tools/requirements.txt; розбирає синтаксис Java до 8 (ADR-0004, INC-001)
       - name: Install OO audit tool
         run: pip install -r tools/requirements.txt
-      # God Object: 11 сервісів після декомпозиції ЛР8 мають CBO ≤ 8 і LCOM ≤ 0.2
+      # CAPA-1: регресійні тести legacy-модуля (fixtures Java 8 / record / Java 17)
+      - name: Unit tests of OO tools
+        run: python3 -m unittest discover -s tools/tests -v
+      # CAPA-2: синтаксис Java 9+ → зрозумілий FAIL з file:line до запуску javalang
+      - name: Java syntax guard
+        run: python3 tools/java_syntax_guard.py
+      # God Object: 11 сервісів після декомпозиції ЛР8 мають CBO ≤ 8 і LCOM ≤ 0.2.
+      # Код 3 = збій інструмента, а не вердикт → алерт A-05 OOGateToolError (runbook RB-002)
       - name: God Object gate
-        run: ./scripts/oo-gate-god-object.sh ci
+        run: |
+          rc=0; ./scripts/oo-gate-god-object.sh ci || rc=$?
+          if [ "$rc" -eq 3 ]; then echo "::error title=A-05 OOGateToolError::oo_metrics.py не видав вердикт (exit 3). Runbook RB-002"; fi
+          exit "$rc"
       # Inheritance Hell: класи звітів мають DIT ≤ 1 і NMO = 0
       - name: Inheritance gate
-        run: ./scripts/oo-gate-inheritance.sh ci
+        run: |
+          rc=0; ./scripts/oo-gate-inheritance.sh ci || rc=$?
+          if [ "$rc" -eq 3 ]; then echo "::error title=A-05 OOGateToolError::oo_metrics.py не видав вердикт (exit 3). Runbook RB-002"; fi
+          exit "$rc"
       - name: Upload OO report
         if: always()
         uses: actions/upload-artifact@v7

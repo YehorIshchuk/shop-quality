@@ -17,6 +17,7 @@ tags: [process]
 | [LAB8_REPORT](LAB8_REPORT.md) | ООП-аудит CK/MOOD, God Object, Inheritance Hell | published (архів) |
 | [LAB10_REPORT](LAB10_REPORT.md) | аудит документації, архітектурний паспорт, handover | published (архів) |
 | [LAB11_REPORT](LAB11_REPORT.md) | Documentation as Code: MkDocs, OpenAPI, CI/CD документації | published (архів) |
+| [LAB12_REPORT](LAB12_REPORT.md) | SRE, ITIL change management, інцидент, RCA, CAPA, план супроводу | published |
 | [DEMO](DEMO.md) | відтворення станів ЛР1/ЛР8 на Docker | **deprecated** → [[local-setup]] |
 
 ## Стани репозиторію (git-теги)
@@ -28,4 +29,6 @@ tags: [process]
 | `lab8-inheritance-baseline` / `-fail` / `-pass` | ієрархія звітів DIT 3 → каскадний злам → композиція |
 | `lab10-decay-fail` / `lab10-docs-pass` | HTTP API без оновлення документів → документацію відновлено |
 | `lab11-ci-fail` / `lab11-ci-pass` | мертве посилання → strict-збірка Exit 1 → відновлено, Exit 0 |
+| `v1.1.0-rc.1` / `v1.1.0` | реліз-кандидат і реліз за RFC-001 (OO-гейти в CI) |
+| `lab12-incident-fail` / `lab12-capa-pass` | INC-001: legacy-модуль зупинив конвеєр → CAPA, конвеєр зелений |
 | `docs-v1.0` / `docs-v2.0` | знімки документації: паспорт ЛР10 / база знань ЛР11 |

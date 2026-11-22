@@ -193,7 +193,7 @@ erDiagram
 | `StockReservation` | `allocate(customer, product, requested): int`, `reserve(order)`, `release(order)` | `StockAllocator` → Placement/Cancellation |
 | `OrderStore` | `save(order)`, `findById(id)`, `findAll()`, `require(id)` | `FileOrderRepository` → усі order-сервіси |
 | `PricingPolicy` | `discountFor(order)`, `shippingFor(order)` | `PricingService` → Placement |
-| `PaymentGateway` | `charge(customerId, amount): PaymentResult` (незмінний value object, Java `record`), `refund(txId): boolean` | `FakePaymentGateway` → `OrderPaymentService` |
+| `PaymentGateway` | `charge(customerId, amount): PaymentResult` (незмінний value object — `final` клас, не `record`: ADR-0004), `refund(txId): boolean` | `FakePaymentGateway` → `OrderPaymentService` |
 | `PaymentProcessor` | `pay(orderId): boolean`, `refund(orderId)` | `OrderPaymentService` → `OrderCancellationService` |
 | `SalesStatistics` | `record(order)`, `revert(order)`, `top(limit): Map` | `SalesLedger` → `OrderPaymentService` |
 | `Notifier` | `send(email, subject, body)` | `ConsoleNotificationSender` → усі сервіси зі сповіщеннями |

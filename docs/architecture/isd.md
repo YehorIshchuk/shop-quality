@@ -148,6 +148,10 @@ flowchart LR
 
 - `pip install -r tools/requirements.txt` (`javalang==0.13.0`), Python ≥ 3.9.
 - `tools/oo_metrics.py` → `reports/oo/<stage>/`; `tools/sonar_api_report.py` → таблиці з Web API; `tools/doc_audit.py` → `reports/docs/`.
+- `oo_metrics.py` — legacy-компонент ([документація, борг](../legacy/oo-metrics.md)); коди виходу **0** PASS · **1** порушено
+  поріг · **3** збій інструмента (OO TOOL ERROR → A-05, [RB-002](../runbooks/RB-002.md)).
+- `tools/java_syntax_guard.py` — перевірка синтаксису Java ≤ 8 перед гейтами ([ADR-0004](adr/0004-javalang-java8-syntax-limit.md)).
+- Тести інструментів: `python3 -m unittest discover -s tools/tests` (крок job `oo-gates`).
 
 ## 5. Моніторинг
 
@@ -155,7 +159,8 @@ flowchart LR
 |---|---|---|---|
 | Стан D4 | `curl -s localhost:9000/api/system/status` | `{"status":"UP"}` до 3 хв після старту | `logs/es.log` → вільне місце / версія Java |
 | Якість коду | `scripts/quality-gate-status.sh` | `projectStatus.status = OK` | блок релізу, виправлення до PASS |
-| Архітектура | `scripts/oo-gate-*.sh check` | `OO GATE: PASS` | рефакторинг до PASS |
+| Архітектура | `scripts/oo-gate-*.sh check` | `OO GATE: PASS` (exit 0) | exit 1 — рефакторинг до PASS; exit 3 — A-05, [[RB-002]] |
+| Вердикт конвеєра | job `oo-gates` + щотижневий запуск `docs.yml` (пн 06:17 UTC) | SLI `pipeline-verdict` ≥ 95 % ([slo.yaml](../slo.yaml)) | A-05 → [[RB-002]]; A-04 при витраті бюджету |
 | Актуальність документації | `tools/doc_audit.py --gate` | `DOC CURRENCY GATE: PASS`, Behind = 0 | оновити документ у тому ж PR/коміті |
 | Доступність і латентність D1 | `tools/sli_probe.py --check`, health-перевірка | SLO з [slo.yaml](../slo.yaml); алерти A-01…A-03 ([каталог](../runbooks/alerts.md)) | [[RB-001]] |
 | Робота D1 | лог JUL у stderr | рядки звіту без `SEVERE` | розбір стек-трейсу, тест на регресію |

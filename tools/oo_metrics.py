@@ -9,7 +9,7 @@ Usage:
     pip install javalang
     python tools/oo_metrics.py src/main/java -o reports/oo/baseline
     python tools/oo_metrics.py src/main/java -o reports/oo/after --gate "PricingService,OrderPlacementService" \
-           --max-cbo 8 --max-lcom 0.2              # exit code 1 => FAIL
+           --max-cbo 8 --max-lcom 0.2              # exit 0 PASS, 1 gate FAIL, 3 tool error (unparsable source)
 
 Metric definitions (all computed for project types only, JDK types are ignored):
     WMC   - Weighted Methods per Class = sum of McCabe cyclomatic complexity of methods and constructors
@@ -274,8 +274,20 @@ def cognitive(body_node) -> int:
 
 # --------------------------------------------------------------------------- parsing
 
+EXIT_PASS, EXIT_GATE_FAIL, EXIT_TOOL_ERROR = 0, 1, 3   # CAPA-1 (INC-001): збій інструмента != вердикт
+
+
+class ParseFailure(Exception):
+    """javalang не зміг розібрати один або більше файлів. Несе перелік (path, line, message)."""
+
+    def __init__(self, failures):
+        self.failures = failures
+        super().__init__(f"{len(failures)} file(s) cannot be parsed")
+
+
 def parse_project(src_root: Path, exclude=()) -> dict:
     types: dict[str, TypeInfo] = {}
+    failures = []
     for path in sorted(src_root.rglob("*.java")):
         if path.stem in exclude:
             continue
@@ -284,9 +296,9 @@ def parse_project(src_root: Path, exclude=()) -> dict:
             cu = javalang.parse.parse(text)
         except (javalang.parser.JavaSyntaxError, javalang.tokenizer.LexerError) as e:
             at = getattr(e, "at", None)
-            where = f" near line {at.position.line}" if at is not None and getattr(at, "position", None) else ""
-            sys.exit(f"ERROR: cannot parse {path}{where}. javalang supports Java syntax up to Java 8 "
-                     f"(+ var); rewrite switch expressions / records / text blocks in this file.")
+            line = at.position.line if at is not None and getattr(at, "position", None) else None
+            failures.append((path, line, type(e).__name__))
+            continue
         pkg = cu.package.name if cu.package else ""
         for _, decl in cu.filter(T.TypeDeclaration):
             kind = ("interface" if isinstance(decl, T.InterfaceDeclaration)
@@ -303,6 +315,8 @@ def parse_project(src_root: Path, exclude=()) -> dict:
             info.implements = [r.name.split(".")[-1] for r in (impl or [])]
             info.lines = text.count("\n") + 1
             types[decl.name] = info
+    if failures:
+        raise ParseFailure(failures)
     return types
 
 
@@ -638,7 +652,17 @@ def main(argv=None):
     args = ap.parse_args(argv)
 
     exclude = {c.strip() for c in args.exclude.split(",") if c.strip()}
-    result = compute(parse_project(args.src, exclude))
+    try:
+        types = parse_project(args.src, exclude)
+    except ParseFailure as pf:
+        print("OO TOOL ERROR: javalang 0.13.0 cannot parse these files (supports Java syntax up to 8, see ADR-0004):",
+              file=sys.stderr)
+        for path, line, kind in pf.failures:
+            print(f"  {path}:{line or '?'}  {kind}", file=sys.stderr)
+        print("No verdict was produced (exit 3 = tool error, NOT a threshold violation). "
+              "Run tools/java_syntax_guard.py for details; runbook RB-002.", file=sys.stderr)
+        return EXIT_TOOL_ERROR
+    result = compute(types)
     result["generatedAt"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
     result["source"] = str(args.src)
     focus = [c.strip() for c in args.focus.split(",") if c.strip()]
@@ -653,7 +677,7 @@ def main(argv=None):
 
     gate = [c.strip() for c in args.gate.split(",") if c.strip()]
     if not gate:
-        return 0
+        return EXIT_PASS
     by = {r["class"]: r for r in result["classes"]}
     failed = False
     for c in gate:
@@ -676,7 +700,7 @@ def main(argv=None):
         print(f"  {status} {c}: CBO={r['CBO']} LCOM={r['LCOM']} LCOM4={r['LCOM4']} DIT={r['DIT']} NMO={r['NMO']}"
               + (f"  <- {'; '.join(problems)}" if problems else ""))
     print("OO GATE:", "FAIL" if failed else "PASS")
-    return 1 if failed else 0
+    return EXIT_GATE_FAIL if failed else EXIT_PASS
 
 
 if __name__ == "__main__":
