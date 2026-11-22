@@ -1,0 +1,33 @@
+# deploy-api.sh після виправлення; java запущено через лаунчер з дочірньою JVM (як /usr/bin/java на macOS), 2026-11-22
+# до виправлення (той самий лаунчер): після deploy v1.1.0 порт слухала стара JVM lab11-ci-pass, HEALTH OK відповідав їй
+$ ./scripts/deploy-api.sh lab10-docs-pass
+2026-11-22T20:02:50Z  збираю lab10-docs-pass у /tmp/dd/releases/lab10-docs-pass
+2026-11-22T20:02:51Z  запускаю lab10-docs-pass на :18097
+2026-11-22T20:02:53Z  HEALTH OK за 2 с — розгорнуто lab10-docs-pass (попередня: немає)
+   → порт слухає PID 1165 · JVM API запущено: 1
+$ ./scripts/deploy-api.sh v1.1.0
+2026-11-22T20:02:53Z  збираю v1.1.0 у /tmp/dd/releases/v1.1.0
+2026-11-22T20:02:54Z  зупиняю PID 1165 (lab10-docs-pass)
+2026-11-22T20:02:55Z  запускаю v1.1.0 на :18097
+2026-11-22T20:02:56Z  HEALTH OK за 2 с — розгорнуто v1.1.0 (попередня: lab10-docs-pass)
+   → порт слухає PID 1255 · JVM API запущено: 1
+$ ./scripts/deploy-api.sh rollback
+2026-11-22T20:02:56Z  ВІДКАТ на lab10-docs-pass
+2026-11-22T20:02:56Z  зупиняю PID 1255 (v1.1.0)
+2026-11-22T20:02:56Z  запускаю lab10-docs-pass на :18097
+2026-11-22T20:02:57Z  HEALTH OK за 2 с — розгорнуто lab10-docs-pass (попередня: v1.1.0)
+   → порт слухає PID 1318 · JVM API запущено: 1
+$ ./scripts/deploy-api.sh status
+current:  lab10-docs-pass
+previous: v1.1.0
+pid:      1318 (слухає :18097; у файлі: 1318)
+health:   UP (http://localhost:18097/api/health)
+   → порт слухає PID 1318 · JVM API запущено: 1
+$ curl -X DELETE /api/health   # 200 лише у версії lab10-docs-pass → після відкату працює саме вона
+200
+$ # порт зайнятий чужим процесом → відмова розгортати
+2026-11-22T20:02:59Z  ПОРТ :18098 ЗАЙНЯТИЙ PID 1369 (python3) — розгортання скасовано
+   exit=3
+$ ./scripts/deploy-api.sh stop
+2026-11-22T20:02:59Z  зупинено
+   → JVM API запущено: 0

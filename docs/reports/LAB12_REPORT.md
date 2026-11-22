@@ -26,7 +26,8 @@ tags: [process, ops]
 | `821c18f` (тег `lab12-incident-fail`) | `ops(incident): capture legacy module outage, FAIL` | 3.2 |
 | `1beae41` (тег `lab12-capa-pass`) | `docs(maintenance): deliver capa actions and swebok plan, PASS` | 3.3–3.5 |
 | `fda32db` | `fix(ops): restore drill strict build without -q, drill #3 PASS` | 1 (знахідка валідації) |
-| наступний | `fix(ops): restore drill refuses busy port and unhealthy restored API` | 1 (знахідка валідації) |
+| `d095a26` | `fix(ops): restore drill refuses busy port and unhealthy restored API` | 1 (знахідка валідації) |
+| наступний | `fix(ops): deploy-api.sh stops the real JVM and refuses a busy port` | 1 (знахідка валідації) |
 
 ---
 
@@ -39,6 +40,8 @@ tags: [process, ops]
 deploy|rollback|status`, рішення приймає людина); шлях до рівня 2 — автоматичний відкат при провалі health, рівня 3 —
 самовідновлення супервізором. Відкат перевірено: `lab10-docs-pass → lab11-ci-pass → rollback`, health UP за 2 с
 (доказ — `DELETE /api/health` = 200 на старій версії) — [лог](https://github.com/YehorIshchuk/shop-quality/blob/main/docs/reports/lab12/deploy-rollback.log).
+Прогін на MacBook виявив, що скрипт не зупиняв справжню JVM (лог ШІ, п. 17) → виправлено, повторний сценарій з
+перевіркою «одна JVM, порт слухає новий PID» — [лог](https://github.com/YehorIshchuk/shop-quality/blob/main/docs/reports/lab12/deploy-pid-fix.log).
 
 > 📸 **Скріншот 1** — `./scripts/deploy-api.sh status` і `rollback` у терміналі.
 
@@ -183,9 +186,10 @@ SLO і SLA не порушено.
 | 13 | Часи тріажу 19:11–19:15 в INC-001 | — | ⚠️ це хвилини симуляції (ручні кроки), не машинні мітки; машинні — з логів |
 | 15 | `restore-drill.sh` за замовчуванням збирає базу знань `mkdocs build --strict -q` | мутаційна перевірка: мертве посилання + `--strict -q` | ❌ **exit 0 — хибний PASS** (та сама пастка, що в ЛР11 п. 8) → без `-q`, drill #3 PASS |
 | 16 | «Restore drill PASS на MacBook» (скріншот 2) | `curl localhost:18090/api/health` після drill | ❌ відповів API з деплою, що лишився запущеним: drill не перевіряв, що порт вільний і health дав **свій** процес → перевірки додано, негативний тест FAIL / позитивний PASS (drill #4) |
+| 17 | «`deploy-api.sh` зупиняє стару версію перед запуском нової» (скріншот 1, «HEALTH OK» на кожному кроці) | `lsof -iTCP:18090` на MacBook після відкату | ❌ порт тримала **перша** JVM (PID 49427), а в `api.pid` був PID 49426 зайвого підшела: `( cd && java > log & )` фонить увесь список. Тож «розгортання v1.1.0» і «відкат» відповідала стара версія — хибні HEALTH OK. Та сама причина — зависання під `\| tee` (KI-3). Виправлено: `exec` + PID із порту + відмова на зайнятому порту, сценарій перевірено з лаунчером як на macOS |
 | 14 | Конвеєр на GitHub: зелений → червоний → зелений | Actions після push (скріншоти 3–5) | заповнює студент |
 
-**Висновок.** Десять тверджень ШІ (1–7, 9, 11, 15, 16) без перевірки дали б хибні документи. Найважливіше для ЛР12 — п. 7:
+**Висновок.** Одинадцять тверджень ШІ (1–7, 9, 11, 15–17) без перевірки дали б хибні документи. Найважливіше для ЛР12 — п. 7:
 ШІ ледь не зробив інцидент «брудним» (червоним із двох причин), що зруйнувало б RCA.
 
 ## Пов'язані документи

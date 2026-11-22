@@ -228,8 +228,13 @@ export BACKUP_PASSPHRASE='…'          # з Keychain
 
 ```bash
 git fetch origin --tags && ./scripts/deploy-api.sh v1.1.0     # збірка → зупинка старої → запуск → health ≤ 30 с
-./scripts/deploy-api.sh status                                # current / previous / health: UP
+./scripts/deploy-api.sh status                                # current / previous / PID / health: UP
 ```
+
+Гарантії скрипта (виправлено 2026-11-22 після прогону на MacBook, [лог](https://github.com/YehorIshchuk/shop-quality/blob/main/docs/reports/lab12/deploy-pid-fix.log)):
+перед запуском порт має бути вільним — стара версія зупиняється за PID процесу, що **слухає порт** (на macOS
+`/usr/bin/java` — лаунчер, і PID із `$!` не є PID JVM); чужий процес на порту → відмова, exit 3. Інакше health
+відповідала б стара версія і розгортання/відкат «проходили» б хибно.
 
 ### 7.2 Оновлення з міграціями
 
