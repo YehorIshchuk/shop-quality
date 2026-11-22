@@ -1,0 +1,14 @@
+$ ./scripts/restore-drill.sh /tmp/shop-backup/shop-quality-full-20261122T184859Z.bundle.enc   # drill #2 після виправлення, BUILD_CMD=javac (sandbox)
+18:49:00Z  +   0s  1. перевірка цілісності: sha256
+/tmp/shop-backup/shop-quality-full-20261122T184859Z.bundle.enc: OK
+18:49:00Z  +   0s  2. розшифрування AES-256
+18:49:01Z  +   1s  3. git bundle verify
+/tmp/tmp.OmuXS7eEwb/restore.bundle is okay
+18:49:01Z  +   1s  4. клонування в чистий каталог
+18:49:01Z  +   1s     HEAD 8250f5d docs(report): add LAB11 screenshots, fix Try-it-out note  ·  тегів: 16
+18:49:01Z  +   1s  5. збірка і тести: mkdir -p target/classes && javac -encoding UTF-8 -d target/classes $(find src/main/java -name "*.java") && bash /home/claude/verify.sh . | tail -1
+Tests passed: 25, failed: 0
+18:49:06Z  +   6s  6. база знань: чисте venv + requirements-docs.txt + python /tmp/mk_online_drill.py 2>&1 | grep -E "^WARNING|Aborted|built in"
+INFO    -  Documentation built in 1.85 seconds
+18:49:19Z  +  19s  7. запуск API на :18080 і health-перевірка
+18:49:20Z  +  20s  RESTORE DRILL: PASS — фактичний RTO 20 с (ціль ISD: ≤ 900 с)

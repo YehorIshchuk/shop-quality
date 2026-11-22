@@ -59,6 +59,14 @@ nav:
           - architecture/adr/0002-in-memory-storage-with-csv-export.md
           - architecture/adr/0003-embedded-jdk-http-server.md
       - architecture/blueprint-lab8.md
+  - "5 · Експлуатація і супровід":
+      - slo.md
+      - runbooks/RB-001.md
+      - runbooks/alerts.md
+      - "Управління змінами":
+          - changes/CCB-001.md
+          - changes/release-checklist.md
+      - maintenance-plan.md
   - "Історія змін": changelog.md
   - "Архів процесу":
       - reports/index.md
@@ -100,6 +108,8 @@ markdown_extensions:
   - tables
   - toc:
       permalink: true
+      slugify: !!python/object/apply:pymdownx.slugs.slugify   # юнікодні якорі, як на GitHub (#7-відкат)
+        kwds: {case: lower}
   - pymdownx.details
   - pymdownx.superfences:
       custom_fences:

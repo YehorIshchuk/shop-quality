@@ -1,0 +1,16 @@
+$ ./scripts/restore-drill.sh /tmp/shop-backup/shop-quality-full-20261122T184822Z.bundle.enc   # drill #1, BUILD_CMD=javac (sandbox)
+18:48:24Z  +   0s  1. перевірка цілісності: sha256
+/tmp/shop-backup/shop-quality-full-20261122T184822Z.bundle.enc: OK
+18:48:24Z  +   0s  2. розшифрування AES-256
+18:48:25Z  +   1s  3. git bundle verify
+/tmp/tmp.xOLRZI422F/restore.bundle is okay
+18:48:25Z  +   1s  4. клонування в чистий каталог
+18:48:25Z  +   1s     HEAD 8250f5d docs(report): add LAB11 screenshots, fix Try-it-out note  ·  тегів: 16
+18:48:25Z  +   1s  5. збірка і тести
+Tests passed: 25, failed: 0
+18:48:30Z  +   6s  6. база знань: mkdocs build --strict
+Error: MkDocs encountered an error parsing the configuration file: while constructing a Python object
+cannot find module 'mermaid2' (No module named 'mermaid2')
+  in "/tmp/tmp.xOLRZI422F/shop-quality/mkdocs.yml", line 108, column 19
+# RESTORE DRILL: FAIL — відновлення залежало від інструментів старої машини (системний mkdocs без плагінів).
+# Виправлення процедури: крок 6 створює чисте venv і ставить requirements-docs.txt (scripts/restore-drill.sh).

@@ -25,7 +25,10 @@
     "docs/developer/CONTRIBUTING.md",
     "docs/developer/local-setup.md",
     "docs/developer/coding-standards.md",
-    "CHANGELOG.md"
+    "CHANGELOG.md",
+    "docs/slo.yaml",
+    "docs/runbooks/RB-001.md",
+    "docs/runbooks/alerts.md"
   ],
   "components": [
     {

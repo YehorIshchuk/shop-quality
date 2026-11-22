@@ -5,6 +5,12 @@
 
 ## [Unreleased]
 
+### Додано
+
+- Експлуатаційний пакет SRE (ЛР12): runbook RB-001 і `scripts/deploy-api.sh` (розгортання/відкат), каталог алертів,
+  `docs/slo.yaml` з трьома SLI і перевіркою бюджетів (`tools/slo_budget.py`), SLI-проба `tools/sli_probe.py`,
+  політика бекапу 3-2-1 (`scripts/backup.sh`) і restore drill (`scripts/restore-drill.sh`).
+
 ### Виправлено
 
 - Сторінка API: «Try it out» працює через локальний `mkdocs serve`; з GitHub Pages Chrome блокує запити до `localhost`.

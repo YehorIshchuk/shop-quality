@@ -1,0 +1,22 @@
+{
+  "measured_at_utc": "2026-11-22T18:46:16+00:00",
+  "duration_s": 3.15,
+  "target": "http://localhost:18080",
+  "requests": 6000,
+  "concurrency": 8,
+  "status_codes": {
+    "200": 5389,
+    "404": 611
+  },
+  "sli": {
+    "availability": 100.0,
+    "latency_under_300ms": 100.0,
+    "latency_good_windows": 100.0
+  },
+  "latency_ms": {
+    "p50": 3.26,
+    "p95": 9.22,
+    "p99": 13.64,
+    "max": 136.72
+  }
+}

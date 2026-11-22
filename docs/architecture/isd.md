@@ -8,7 +8,7 @@ type: product / operational
 audience: DevOps, розробники
 review_cycle_days: 90
 last_reviewed: 2026-11-21
-change_log: 2026-11-21 — D1 став довгоживучим сервісом з HTTP-портом 8080 (SHOP_HTTP_PORT)
+change_log: "2026-11-22 — §6 backup policy 3-2-1, RTO/RPO з розрахунком, restore drill; §7 експлуатаційні процедури (ЛР12)"
 ---
 
 # ISD — Infrastructure Specification Document: Shop Quality
@@ -75,6 +75,11 @@ flowchart TB
 | `SONAR_JAVA_PATH` | запуск D4 `sonar.sh` | `/Library/Java/JavaVirtualMachines/temurin-21.jdk/Contents/Home/bin/java` | ні |
 | `JAVA_HOME` | Maven, D1 | JDK 17+ (на станції — 21/22) | ні |
 | `SHOP_HTTP_PORT` | `ShopApplication` → `ShopHttpApi` | порт HTTP API, за замовч. `8080`; `0` — випадковий вільний | ні |
+| `DEPLOY_DIR` | `scripts/deploy-api.sh` (RB-001) | каталог релізів і PID, за замовч. `~/shop-deploy` | ні |
+| `BUILD_CMD` | `scripts/deploy-api.sh`, `scripts/restore-drill.sh` | команда збірки, за замовч. `mvn -B -q -DskipTests package` / `mvn -B -q verify` | ні |
+| `MKDOCS_CMD` | `scripts/restore-drill.sh` | збірка бази знань у drill, за замовч. `mkdocs build --strict -q` | ні |
+| `BACKUP_DIR` | `scripts/backup.sh` | носій №2 для копій, напр. `/Volumes/ShopBackup` | ні |
+| `BACKUP_PASSPHRASE` | `scripts/backup.sh`, `scripts/restore-drill.sh` | ключ шифрування AES-256 — лише з Keychain / менеджера паролів | **так** |
 | `GATE_CLASSES` | `scripts/oo-gate-inheritance.sh` | список класів, за замовч. `ReportTable,SalesReport,MonthlySalesReport` | ні |
 
 ## 4. Вузли розгортання
@@ -152,20 +157,94 @@ flowchart LR
 | Якість коду | `scripts/quality-gate-status.sh` | `projectStatus.status = OK` | блок релізу, виправлення до PASS |
 | Архітектура | `scripts/oo-gate-*.sh check` | `OO GATE: PASS` | рефакторинг до PASS |
 | Актуальність документації | `tools/doc_audit.py --gate` | `DOC CURRENCY GATE: PASS`, Behind = 0 | оновити документ у тому ж PR/коміті |
-| Доступність D1 | `curl -s localhost:8080/api/health` | `{"status":"UP"}`, відповідь < 1 с | перевірити, що процес живий і порт не зайнятий; перезапустити D1 |
+| Доступність і латентність D1 | `tools/sli_probe.py --check`, health-перевірка | SLO з [slo.yaml](../slo.yaml); алерти A-01…A-03 ([каталог](../runbooks/alerts.md)) | [[RB-001]] |
 | Робота D1 | лог JUL у stderr | рядки звіту без `SEVERE` | розбір стек-трейсу, тест на регресію |
 
 <a id="d6-backup"></a><a id="d6"></a>
 
-## 6. Резервне копіювання та відновлення (RTO / RPO)
+## 6. Резервне копіювання, RTO / RPO і restore drill
 
-| Актив | Резервна копія | RPO (допустима втрата) | RTO (час відновлення) | Процедура відновлення |
+### 6.1 Цільові RTO / RPO з розрахунком
+
+**RTO** (допустимий час відновлення) = виявлення + рішення + сума часу кроків відновлення.
+**RPO** (допустима втрата даних) = максимальний інтервал між двома копіями.
+
+| Актив | RPO | Розрахунок RPO | RTO | Розрахунок RTO |
 |---|---|---|---|---|
-| Код, документація, теги | GitHub `YehorIshchuk/shop-quality` (D6) | ≤ 1 робочий день (push щонайменше раз на день роботи) | ≤ 15 хв | `git clone` → `mvn -B clean verify` |
-| Дані замовлень/залишків (D2) | немає (in-memory за ADR-0002); ручний CSV-експорт | весь сеанс роботи процесу (тепер процес довгоживучий — втрата при кожному перезапуску D1) | ≈ 5 с (перезапуск D1 до `GET /api/health` = 200, демо-дані засіваються заново) | `Ctrl+C` → запустити D1 → health-check |
-| Історія аналізів SonarQube | копія `data/` при зупиненому D4 (необов'язково) | усі аналізи після останньої копії | ≤ 30 хв | перевстановити ZIP → `setup-quality-gate.sh` → пересканувати теги ([DEMO.md §2](../reports/DEMO.md)) |
-| Токен `SONAR_TOKEN` | не зберігається | — | ≤ 2 хв | згенерувати новий у My Account → Security, старий — Revoke |
+| Код, документація, теги | **≤ 24 год** | push на GitHub щонайменше раз на робочий день + щоденна інкрементна копія → найгірше втрачається робота з моменту останньої копії, ≤ 1 доба | **≤ 15 хв** | виявлення 2 хв + розшифрування й verify 1 хв + clone 1 хв + `mvn verify` 3 хв + `pip install` і strict-збірка 3 хв + запуск і health 1 хв = **11 хв** (+ 4 хв запасу). Факт drill #2: 20 с (кеш залежностей) |
+| D1 · HTTP API (процес) | — (стану немає) | процес не зберігає даних поза пам'яттю | **≤ 5 хв** | алерт A-01 (90 с) + рішення 1 хв + перезапуск/відкат за RB-001 (10 с без збірки, ≤ 2 хв зі збіркою) = **≈ 4,5 хв**. Факт: відкат 2 с до health UP ([лог](https://github.com/YehorIshchuk/shop-quality/blob/main/docs/reports/lab12/deploy-rollback.log)) |
+| D2 · дані замовлень у JVM heap | **весь сеанс процесу** | прийнятий ризик ADR-0002: демо-дані засіваються заново при старті; реальних клієнтських даних немає | ≈ 5 с | перезапуск D1 до health = 200 |
+| Історія аналізів SonarQube | ≤ 7 днів | копія каталогу `data/` при зупиненому D4 щонеділі | ≤ 30 хв | перевстановлення ZIP 10 хв + `setup-quality-gate.sh` 2 хв + пересканування тегів 15 хв |
+| `SONAR_TOKEN` | — | не копіюється (секрет) | ≤ 2 хв | перевипуск у My Account → Security, старий — Revoke |
+
+### 6.2 Політика резервного копіювання (backup policy)
+
+| Параметр | Значення |
+|---|---|
+| Обсяг | репозиторій з усією історією і тегами: повна копія ≈ 17 МБ (`git bundle --all`), інкрементна — кілобайти |
+| Типи і розклад | **повна** — щонеділі (`./scripts/backup.sh full`); **інкрементна** — щодня наприкінці робочого дня (`./scripts/backup.sh incremental`, коміти після `refs/backup/last`) |
+| Retention | інкрементні — 14 днів; повні — 8 тижнів; перша повна копія кожного місяця — 12 місяців (переноситься вручну в архів) |
+| Шифрування | AES-256-CBC, PBKDF2 (200 000 ітерацій), ключ `BACKUP_PASSPHRASE` — у Keychain macOS / менеджері паролів, не в репозиторії; цілісність — `.sha256` поруч із копією; у транзиті до GitHub — HTTPS |
+| Правило **3-2-1** | **3 копії:** робоча копія на SSD MacBook + GitHub + зашифровані bundle-и на зовнішньому диску. **2 типи носіїв:** внутрішній SSD і зовнішній USB-диск (`BACKUP_DIR=/Volumes/ShopBackup`). **1 поза майданчиком:** GitHub (хмара, інший регіон) |
+| Відповідальний | Yehor Ishchuk; контроль — щомісячний restore drill (6.3) |
+
+### 6.3 Процедура тестового відновлення (restore drill)
+
+Копія, з якої ніколи не відновлювались, копією не вважається. Drill — **щомісяця** (перший робочий день) і після
+кожної зміни скриптів бекапу:
+
+```bash
+export BACKUP_PASSPHRASE='…'          # з Keychain
+./scripts/restore-drill.sh /Volumes/ShopBackup/shop-quality-full-<дата>.bundle.enc
+```
+
+Кроки скрипта: перевірка `.sha256` → розшифрування → `git bundle verify` → clone у чистий каталог → `mvn -B -q verify`
+→ **чисте venv** + `requirements-docs.txt` + `mkdocs build --strict` → запуск API і `GET /api/health`, `GET /api/orders/ORD-1`
+→ фактичний RTO. Критерій: `RESTORE DRILL: PASS` і RTO ≤ 900 с.
+
+| Drill | Дата (UTC) | Результат | Висновок |
+|---|---|---|---|
+| #1 | 2026-11-22 18:48 | ❌ FAIL на кроці 6: `No module named 'mermaid2'` | відновлення неявно залежало від інструментів старої машини (системний `mkdocs` без плагінів) → крок 6 переписано на чисте venv |
+| #2 | 2026-11-22 18:49 | ✅ PASS, RTO **20 с** | код, 16 тегів, 25 тестів, strict-збірка бази знань, API health — відновлено |
+
+Логи: [drill #1](https://github.com/YehorIshchuk/shop-quality/blob/main/docs/reports/lab12/restore-drill-1-fail.log) ·
+[drill #2](https://github.com/YehorIshchuk/shop-quality/blob/main/docs/reports/lab12/restore-drill-2-pass.log).
+
+## 7. Експлуатаційні процедури
+
+### 7.1 Розгортання версії
+
+Розгортання — тільки з тегу, що пройшов конвеєр `docs.yml`, і після погодженого RFC
+([Release Checklist](../changes/release-checklist.md)). Процедура з командами і health-перевіркою — [[RB-001]]:
+
+```bash
+git fetch origin --tags && ./scripts/deploy-api.sh v1.1.0     # збірка → зупинка старої → запуск → health ≤ 30 с
+./scripts/deploy-api.sh status                                # current / previous / health: UP
+```
+
+### 7.2 Оновлення з міграціями
+
+Схеми бази даних немає (ADR-0002), тому «міграції» в цій системі — це зміни **контракту** і **конфігурації**.
+Порядок оновлення:
+
+1. Прочитати розділ версії в [Історії змін](../changelog.md) (`CHANGELOG.md`): «Змінено», «Виправлено», «Видалено».
+2. Порівняти `info.version` у `docs/api/openapi.yaml`: зміна **major** = breaking change → спершу оновити клієнтів за
+   міграційним гайдом у CHANGELOG; minor/patch — сумісні.
+3. Перевірити нові/змінені змінні середовища (§3) і задати їх до запуску (наприклад, `SHOP_HTTP_PORT`).
+4. Розгорнути за §7.1; при невдалій верифікації — `./scripts/deploy-api.sh rollback` (RB-001 §7).
+5. Якщо з'явиться персистентне сховище — новий ADR, міграції лише зворотні (up/down) і перевіряються на копії перед релізом.
+
+### 7.3 Відновлення після відмови — порядок підняття з урахуванням залежностей
+
+Правило: спершу те, від чого залежать інші (сховище → застосунок → споживачі).
+
+1. **Платформа:** JDK 17+, Maven, Python (перевірка `java -version && mvn -v && python3 --version`).
+2. **Код і артефакт:** якщо робочої копії немає — відновлення з копії за §6.3 (або `git clone` з GitHub).
+3. **Сховище даних:** окремої БД немає — дані D2 живуть у процесі D1 і засіваються при старті (ADR-0002).
+   Для SonarQube D4 сховище (Elasticsearch + H2) піднімається всередині `sonar.sh start` першим — дочекатися `UP`.
+4. **Застосунок D1:** `./scripts/deploy-api.sh <тег>` → `GET /api/health = UP`.
+5. **Споживачі:** API-клієнти, Swagger UI «Try it out», `tools/sli_probe.py --check` — лише після кроку 4.
 
 ## Пов'язані документи
 
-[[sdd]] · [[0002-in-memory-storage-with-csv-export|ADR-0002]] · [[0003-embedded-jdk-http-server|ADR-0003]] · [[local-setup]] · [[maintenance]]
+[[sdd]] · [[0002-in-memory-storage-with-csv-export|ADR-0002]] · [[0003-embedded-jdk-http-server|ADR-0003]] · [[local-setup]] · [[maintenance]] · [[RB-001]] · [[alerts]]

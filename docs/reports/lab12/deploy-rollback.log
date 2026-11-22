@@ -1,0 +1,26 @@
+$ ./scripts/deploy-api.sh lab10-docs-pass
+2026-11-22T18:49:39Z  збираю lab10-docs-pass у /tmp/shop-deploy/releases/lab10-docs-pass
+2026-11-22T18:49:41Z  запускаю lab10-docs-pass на :18090
+2026-11-22T18:49:42Z  HEALTH OK за 2 с — розгорнуто lab10-docs-pass (попередня: немає)
+$ ./scripts/deploy-api.sh lab11-ci-pass
+2026-11-22T18:49:42Z  збираю lab11-ci-pass у /tmp/shop-deploy/releases/lab11-ci-pass
+2026-11-22T18:49:43Z  зупиняю PID 1012 (lab10-docs-pass)
+2026-11-22T18:49:45Z  запускаю lab11-ci-pass на :18090
+2026-11-22T18:49:45Z  HEALTH OK за 1 с — розгорнуто lab11-ci-pass (попередня: lab10-docs-pass)
+$ ./scripts/deploy-api.sh status
+current:  lab11-ci-pass
+previous: lab10-docs-pass
+health:   UP (http://localhost:18090/api/health)
+$ curl -s localhost:18090/api/orders/ORD-1
+{"orderId":"ORD-1","customer":"Kira","status":"PAID","items":4,"total":"31573.50"}
+$ ./scripts/deploy-api.sh rollback
+2026-11-22T18:49:45Z  ВІДКАТ на lab10-docs-pass
+2026-11-22T18:49:45Z  зупиняю PID 1095 (lab11-ci-pass)
+2026-11-22T18:49:47Z  запускаю lab10-docs-pass на :18090
+2026-11-22T18:49:47Z  HEALTH OK за 1 с — розгорнуто lab10-docs-pass (попередня: lab11-ci-pass)
+$ ./scripts/deploy-api.sh status
+current:  lab10-docs-pass
+previous: lab11-ci-pass
+health:   UP (http://localhost:18090/api/health)
+$ curl -s -X DELETE -i localhost:18090/api/health | head -1   # lab10-версія: health приймав будь-який метод
+HTTP/1.1 200 OK

@@ -52,6 +52,10 @@ jobs:
       - name: Review-date audit (front matter)
         run: python3 tools/review_audit.py
 
+      # 5a. Контракт рівня послуг: арифметика Error Budget у docs/slo.yaml, SLA < SLO (ЛР12)
+      - name: SLO spec check
+        run: python3 tools/slo_budget.py --check
+
       # 6. Правило ЛР10 «зміна коду = зміна документації»
       - name: Doc currency gate (LR10)
         run: python3 tools/doc_audit.py --gate

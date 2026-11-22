@@ -1,0 +1,104 @@
+# Контракт рівня послуг Shop Quality — «як код» (ЛР12, Завдання 1).
+# Перевірка арифметики бюджетів: python3 tools/slo_budget.py --check   (крок конвеєра docs.yml)
+# Error Budget = (100% − ціль) × календарне вікно. Вікно 30 днів = 43 200 хв.
+#
+# SLI  — що вимірюємо (точне інженерне визначення, джерело даних).
+# SLO  — внутрішня ціль команди.
+# SLA  — зовнішня обіцянка умовному клієнту; завжди консервативніша за SLO.
+#        Різниця SLA − SLO = буфер надійності: команда реагує на порушення SLO раніше,
+#        ніж порушиться зобов'язання перед клієнтом.
+version: 1
+service: shop-quality
+owner: Yehor Ishchuk
+window:
+  type: rolling
+  days: 30
+  minutes: 43200
+
+slis:
+  - id: api-availability
+    name: Доступність HTTP API
+    definition: >-
+      Частка HTTP-відповідей на запити до /api/* (GET /api/health, /api/orders, /api/orders/{orderId})
+      з кодом, відмінним від 5xx, серед усіх отриманих відповідей за ковзне вікно 30 днів.
+      Відповіді 404 і 405 — коректна поведінка контракту openapi.yaml і рахуються як успішні;
+      мережева відмова або таймаут 5 с рахуються як 5xx.
+    good_events: "count(status < 500)"
+    valid_events: "count(all responses to /api/*, incl. timeouts)"
+    source: tools/sli_probe.py (синтетичні запити) + журнал запусків D1
+    slo: 99.5
+    sla: 99.0
+    error_budget_minutes: {slo: 216.0, sla: 432.0}
+    buffer_rationale: >-
+      0.5 п.п. (216 хв/міс) між SLO і SLA покривають один повний відкат за RB-001 (≈ 5 хв, ISD §6.1)
+      з великим запасом і один незапланований простій станції розробника без порушення обіцянки клієнту.
+    measured:
+      at_utc: "2026-11-22T18:46:16+00:00"
+      requests: 6000
+      value: 100.0
+      evidence: docs/reports/lab12/sli-probe.json
+
+  - id: api-latency
+    name: Латентність HTTP API
+    definition: >-
+      Частка 10-секундних вікон за 30 днів, у яких 95-й перцентиль латентності GET-запитів до /api/*
+      (від надсилання запиту клієнтом до отримання повного тіла відповіді) менший за 300 мс.
+      Вікна без запитів не враховуються.
+    good_events: "count(windows where p95(latency_ms) < 300)"
+    valid_events: "count(windows with >= 1 request)"
+    source: tools/sli_probe.py (клієнтська латентність — верхня оцінка серверної, консервативно)
+    slo: 99.0
+    sla: 97.0
+    error_budget_minutes: {slo: 432.0, sla: 1296.0}
+    buffer_rationale: >-
+      Латентність in-memory API ~10 мс (p95), тобто запас до порогу 300 мс — 30×. Ширший буфер (2 п.п.)
+      бо JVM на ноутбуці ділить ресурси з SonarQube (Elasticsearch) і IDE: короткі сплески — не відмова сервісу.
+    measured:
+      at_utc: "2026-11-22T18:46:16+00:00"
+      p50_ms: 3.26
+      p95_ms: 9.22
+      p99_ms: 13.64
+      value: 100.0
+      evidence: docs/reports/lab12/sli-probe.json
+
+  - id: pipeline-verdict
+    name: Здатність конвеєра якості видати вердикт
+    definition: >-
+      Частка часу за 30 днів, протягом якої останній запуск конвеєра .github/workflows/docs.yml на гілці main
+      завершився вердиктом перевірок — PASS або FAIL з конкретним порушенням якості (мертве посилання,
+      порушення контракту, OO-поріг) — а не збоєм інструмента (необроблений виняток, помилка розбору,
+      exit code 3, таймаут раннера). Час «без вердикту» рахується від завершення першого запуску зі збоєм
+      інструмента до завершення першого наступного запуску з вердиктом.
+    good_events: "minutes where last run on main ended with a verdict"
+    valid_events: "all minutes of the window"
+    source: GitHub Actions — історія запусків workflow docs (Actions → docs), підсумки кроків
+    slo: 95.0
+    sla: 90.0
+    error_budget_minutes: {slo: 2160.0, sla: 4320.0}
+    buffer_rationale: >-
+      Один супроводжувач без нічних чергувань (maintenance-plan.md): збій інструмента ввечері може бути
+      усунений лише наступного робочого дня (до 18 год). 5 п.п. буфера (2160 хв = 36 год) вміщують один
+      такий інцидент без порушення SLA (72 год).
+    measured:
+      period: "2026-11-22, запуски #1–#5"
+      runs: 5
+      tool_failures: 0
+      value: 100.0
+      evidence: "GitHub Actions: run #2 — FAIL-вердикт strict-збірки (коректний), решта PASS"
+
+error_budget_policy:
+  owner: Change Manager (CCB, docs/changes/)
+  thresholds:
+    - consumed_below: 50
+      action: Нормальний режим — релізи за звичайним RFC-процесом.
+    - consumed_from: 50
+      consumed_below: 100
+      action: >-
+        Обережний режим — кожен нормальний RFC вимагає плану відкату, перевіреного на тегу (RB-001 §7),
+        і явного голосу SRE на CCB; стандартні зміни (документація) — без обмежень.
+    - consumed_from: 100
+      action: >-
+        CHANGE FREEZE — функціональні релізи заморожено; CCB погоджує лише зміни класу «термінова»,
+        що підвищують стабільність (виправлення, CAPA). Freeze знімається, коли ковзний бюджет знову > 0
+        або коли CCB підтвердила перевірку ефективності CAPA відповідного інциденту.
+  reporting: Звіт про витрату бюджету — на кожному засіданні CCB (регламент docs/changes/CCB-001.md).
